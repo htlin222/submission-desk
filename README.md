@@ -63,6 +63,8 @@ This repo ships a GitHub Actions pipeline that publishes the site to **Cloudflar
 
 The workflow **creates the Pages project on first run**, so you never have to touch the dashboard's click-maze. Set the secrets under *Settings → Secrets and variables → Actions*, then re-run the workflow and you're live at `https://submission-desk.pages.dev`.
 
+**Prefer to deploy from your laptop?** `cp .env.example .env`, paste your API token, then run `./tools/deploy.sh` — it assembles the site and ships it to Pages with wrangler. (`.env` is gitignored; if you've run `wrangler login` you can skip the token entirely.)
+
 ## Filling the table without guessing
 
 Two of the five columns can come from Crossref instead of your imagination:

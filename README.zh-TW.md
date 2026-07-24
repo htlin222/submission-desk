@@ -65,6 +65,8 @@ python3 -m http.server 8000   # → http://localhost:8000
 
 流水線會在**第一次執行時自動建立 Pages 專案**,你完全不必碰後台的點擊迷宮。到 *Settings → Secrets and variables → Actions* 設好 secret,再重跑 workflow,網站就上線在 `https://submission-desk.pages.dev`。
 
+**想從自己電腦部署?** `cp .env.example .env`,貼上 API token,執行 `./tools/deploy.sh` —— 它會組裝網站並用 wrangler 推上 Pages。(`.env` 已被 gitignore;若你已 `wrangler login`,連 token 都能省。)
+
 ## 不靠猜也能填表
 
 五欄裡有兩欄可以來自 Crossref,而不是你的想像力:

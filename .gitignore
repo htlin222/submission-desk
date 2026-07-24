@@ -98,6 +98,10 @@ ENV/
 secrets.*
 credentials.json
 
+# --- Build / deploy artifacts ----------------------------------------------
+dist/
+.wrangler/
+
 # --- Logs, reports, coverage -----------------------------------------------
 *.log
 logs/
