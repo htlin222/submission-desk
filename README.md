@@ -132,6 +132,7 @@ Details, caveats and the pinned-parameter list: **[docs/CROSSREF.md](docs/CROSSR
 ```bash
 git clone https://github.com/YOUR-USERNAME/submission-desk.git
 cd submission-desk
+./tools/setup.sh your-github-username   # rewrites the placeholder URLs
 open index.html          # macOS
 xdg-open index.html      # Linux
 start index.html         # Windows
