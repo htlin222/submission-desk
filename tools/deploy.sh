@@ -30,9 +30,12 @@ WRANGLER="npx --yes wrangler@latest"
 
 # Assemble a clean two-file static site.
 rm -rf dist
-mkdir -p dist/zh-TW
+mkdir -p dist/zh-TW dist/data
 cp index.html dist/index.html
 cp zh-TW/index.html dist/zh-TW/index.html
+cp data/journals-seed.json dist/data/journals-seed.json 2>/dev/null || true
+# Pages Functions must sit at the root of the deployed directory.
+[ -d functions ] && cp -R functions dist/functions
 
 # Create the Pages project on first run; ignore "already exists".
 $WRANGLER pages project create "$PROJECT" --production-branch=main >/dev/null 2>&1 \

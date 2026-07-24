@@ -163,6 +163,30 @@
   }
   .rm:hover{background:#f0d9d9;color:var(--reject)}
   .tbl-actions{flex:none;display:flex;gap:10px;align-items:center;margin-top:12px;flex-wrap:wrap}
+  /* ---------- journal search (enrichment) ---------- */
+  .jsearch{position:relative;flex:1 1 260px;min-width:220px}
+  .jsearch-input{width:100%;font-family:var(--body);font-size:13.5px;padding:9px 12px;border:1px solid var(--slate-2);border-radius:8px;background:var(--panel);color:var(--ink)}
+  .jsearch-input:focus{outline:none;border-color:var(--slate);box-shadow:0 0 0 3px var(--verdict-soft)}
+  .jsearch-menu{position:absolute;z-index:20;left:0;right:0;bottom:calc(100% + 6px);max-height:320px;overflow:auto;background:var(--panel);border:1px solid var(--line);border-radius:10px;box-shadow:0 -8px 28px #0002;padding:4px}
+  .jsearch-menu[hidden]{display:none}
+  .jitem{display:flex;flex-direction:column;gap:2px;padding:8px 10px;border-radius:7px;cursor:pointer}
+  .jitem:hover,.jitem.active{background:var(--panel-2)}
+  .jitem .jn{font-weight:600;font-size:13.5px}
+  .jitem .jmeta{font-family:var(--mono);font-size:11px;color:var(--muted)}
+  .jbadge{font-family:var(--mono);font-size:9px;letter-spacing:.04em;padding:1px 5px;border-radius:3px;font-weight:600;margin-left:6px}
+  .jbadge.doaj{color:var(--verdict);background:var(--verdict-soft);border:1px solid var(--verdict)}
+  .jsearch-note{padding:6px 10px;font-size:11px;color:var(--muted)}
+  .jrow-flash{animation:jflash 1.1s ease}
+  @keyframes jflash{0%{background:var(--verdict-soft)}100%{background:transparent}}
+  /* ---------- resources ---------- */
+  .res{max-width:900px;overflow:auto;min-height:0}
+  .res-group{margin-bottom:18px}
+  .res-group h3{font-family:var(--disp);font-size:14px;color:var(--slate);margin:0 0 8px}
+  .res-list{display:grid;gap:8px}
+  .res-item{font-size:13px;line-height:1.55}
+  .res-item a{font-weight:600;color:var(--verdict);text-decoration:none;border-bottom:1px solid var(--verdict-soft)}
+  .res-item a:hover{border-bottom-color:var(--verdict)}
+  .res-item span{color:var(--muted)}
   .btn{
     font-family:var(--body);font-weight:500;font-size:13.5px;border-radius:7px;cursor:pointer;
     padding:8px 14px;border:1px solid var(--slate);background:var(--slate);color:var(--panel);transition:.12s;
@@ -321,10 +345,11 @@
     <button class="tab" role="tab" aria-selected="false" aria-controls="p-flow"       id="t-flow"><span class="tnum">8</span><span class="tlab">流程</span></button>
     <button class="tab" role="tab" aria-selected="false" aria-controls="p-gantt"      id="t-gantt"><span class="tnum">9</span><span class="tlab">時程</span></button>
     <button class="tab" role="tab" aria-selected="false" aria-controls="p-method"     id="t-method"><span class="tnum">10</span><span class="tlab">方法</span></button>
+    <button class="tab" role="tab" aria-selected="false" aria-controls="p-resources"  id="t-resources"><span class="tnum">11</span><span class="tlab">資源</span></button>
     <div class="spacer"></div>
     <div class="stepnav">
       <button class="navbtn" id="prevTab" aria-label="上一步">&lsaquo;</button>
-      <span><b id="stepNow">1</b> / 10</span>
+      <span><b id="stepNow">1</b> / 11</span>
       <button class="navbtn" id="nextTab" aria-label="下一步">&rsaquo;</button>
     </div>
   </nav>
@@ -351,7 +376,7 @@
               <table>
                 <thead><tr>
                   <th style="width:100%">期刊</th>
-                  <th><abbr title="影響因子,或該領域的百分位。純粹的聲望值">IF</abbr></th>
+                  <th><abbr title="影響因子。自動帶入為 OpenAlex 兩年平均被引數(代理值),非官方 Clarivate JIF。請於「資源」分頁的 JCR 查證。可手動修改。">IF</abbr></th>
                   <th><abbr title="該刊公布的接受率(%)">接受率&nbsp;%</abbr></th>
                   <th><abbr title="你的契合度 1–5。用來修正接受機率:1×0.5、3×1.0、5×1.6。這組係數未經校準。">契合</abbr> <span class="flag">未校準</span></th>
                   <th><abbr title="到首次決議所需的週數">週</abbr></th>
@@ -364,7 +389,11 @@
               </table>
             </div>
             <div class="tbl-actions">
-              <button class="btn" id="addRow">＋ 新增期刊</button>
+              <div class="jsearch">
+                <input type="text" id="jSearch" class="jsearch-input" placeholder="&#128269; 搜尋真實期刊 — 輸入名稱(OpenAlex)…" autocomplete="off" aria-label="搜尋真實期刊">
+                <div class="jsearch-menu" id="jMenu" hidden></div>
+              </div>
+              <button class="btn ghost" id="addRow">＋ 空白列</button>
               <button class="btn ghost" id="resetRows">還原範例</button>
               <span class="btn ghost filebtn">匯入 Crossref 快照<input type="file" id="snapFile" accept="application/json,.json" aria-label="匯入 Crossref 快照"></span>
             </div>
@@ -484,6 +513,36 @@
       </div>
     </section>
 
+    <!-- 11 RESOURCES -->
+    <section class="tabpanel" id="p-resources" role="tabpanel" aria-labelledby="t-resources" tabindex="0">
+      <div class="phead"><h2>資源</h2><p>對應每一欄與每道門檻的真實工具,點擊於新分頁開啟。</p></div>
+      <div class="pbody"><div class="res scroller">
+        <div class="res-group"><h3>影響因子與指標</h3><div class="res-list">
+          <div class="res-item"><a href="https://jcr.clarivate.com" target="_blank" rel="noopener">JCR — Journal Citation Reports</a> <span>官方 Clarivate 影響因子(JIF)。</span></div>
+          <div class="res-item"><a href="https://www.scopus.com/sources" target="_blank" rel="noopener">Scopus Sources</a> <span>CiteScore、SNIP、SJR。</span></div>
+          <div class="res-item"><a href="https://openalex.org" target="_blank" rel="noopener">OpenAlex</a> <span>免費資料,驅動本工具的自動帶入(IF 代理值＝兩年平均被引數)。</span></div>
+        </div></div>
+        <div class="res-group"><h3>找對期刊(主題契合)</h3><div class="res-list">
+          <div class="res-item"><a href="https://jane.biosemantics.org" target="_blank" rel="noopener">JANE</a> <span>貼上摘要,推薦相符期刊。</span></div>
+          <div class="res-item"><a href="https://journalfinder.elsevier.com" target="_blank" rel="noopener">Elsevier JournalFinder</a> <span>·</span> <a href="https://journalsuggester.springer.com" target="_blank" rel="noopener">Springer Journal Suggester</a> <span>·</span> <a href="https://journalfinder.wiley.com" target="_blank" rel="noopener">Wiley Journal Finder</a></div>
+          <div class="res-item"><a href="https://mjl.clarivate.com" target="_blank" rel="noopener">Web of Science Manuscript Matcher</a> <span>以標題與摘要配對。</span></div>
+        </div></div>
+        <div class="res-group"><h3>正當性 — 避開掠奪型期刊</h3><div class="res-list">
+          <div class="res-item"><a href="https://doaj.org" target="_blank" rel="noopener">DOAJ</a> <span>經審核的開放取用期刊。</span></div>
+          <div class="res-item"><a href="https://thinkchecksubmit.org" target="_blank" rel="noopener">Think · Check · Submit</a> <span>投稿前的檢查清單。</span></div>
+          <div class="res-item"><a href="https://publicationethics.org" target="_blank" rel="noopener">COPE</a> <span>出版倫理標準。</span></div>
+        </div></div>
+        <div class="res-group"><h3>費用／開放取用(APC)</h3><div class="res-list">
+          <div class="res-item"><a href="https://authorservices.taylorandfrancis.com/choose-open/publishing-open-access/open-access-cost-finder/" target="_blank" rel="noopener">Taylor &amp; Francis OA Cost Finder</a> <span>逐刊查 APC 費用。</span></div>
+          <div class="res-item"><a href="https://doaj.org" target="_blank" rel="noopener">DOAJ</a> <span>APC 金額與授權條款。</span></div>
+          <div class="res-item"><a href="https://journalcheckertool.org" target="_blank" rel="noopener">cOAlition S Journal Checker Tool</a> <span>Plan S／補助單位開放取用合規。</span></div>
+        </div></div>
+        <div class="res-group"><h3>索引與觸及</h3><div class="res-list">
+          <div class="res-item"><a href="https://pubmed.ncbi.nlm.nih.gov" target="_blank" rel="noopener">PubMed / MEDLINE</a> <span>·</span> <a href="https://www.scopus.com/sources" target="_blank" rel="noopener">Scopus source list</a></div>
+        </div></div>
+      </div></div>
+    </section>
+
   </main>
 
 
@@ -502,10 +561,10 @@
   ];
 
   var DEFAULTS=[
-    {name:"頂尖刊(衝刺型)", if_:25, rate:8,  fit:3, wk:9, apc:5200},
-    {name:"專科強刊",       if_:8,  rate:20, fit:4, wk:7, apc:3000},
-    {name:"領域主力刊",     if_:4,  rate:35, fit:4, wk:5, apc:2400},
-    {name:"快速穩妥型",     if_:2.4,rate:55, fit:5, wk:4, apc:1800}
+    {name:"New England Journal of Medicine", if_:29.2, rate:6,  fit:3, wk:9,  apc:0},
+    {name:"The Lancet",                      if_:19.22,rate:6,  fit:3, wk:9,  apc:6830},
+    {name:"Perspectives on Medical Education",if_:3.53, rate:28, fit:4, wk:8,  apc:0},
+    {name:"BMC Medical Education",           if_:4.51, rate:40, fit:4, wk:10, apc:2590}
   ];
 
   var WEIGHT_DEFS=[
@@ -934,8 +993,76 @@ var MSG={
 
   function renderAnalytics(ctx){renderSensitivity(ctx);renderPareto(ctx);renderMonteCarlo(ctx);renderCompare(ctx);}
 
+  // ---------- journal search / enrichment ----------
+  var JOURNAL_SEED=[{"name":"Cell","issn":"0092-8674","publisher":"Cell Press","if_proxy":38.54,"apc_usd":10100,"in_doaj":false},{"name":"Nature Medicine","issn":"1078-8956","publisher":"Nature Portfolio","if_proxy":29.28,"apc_usd":11690,"in_doaj":false},{"name":"New England Journal of Medicine","issn":"0028-4793","publisher":"Massachusetts Medical Societ","if_proxy":29.2,"apc_usd":null,"in_doaj":false},{"name":"Science","issn":"0036-8075","publisher":"American Association for the","if_proxy":19.58,"apc_usd":null,"in_doaj":false},{"name":"The Lancet","issn":"0099-5355","publisher":"Elsevier","if_proxy":19.22,"apc_usd":6830,"in_doaj":false},{"name":"Nature","issn":"0028-0836","publisher":"Nature Portfolio","if_proxy":17.81,"apc_usd":11690,"in_doaj":false},{"name":"Nature Communications","issn":"2041-1723","publisher":"Nature Portfolio","if_proxy":16.42,"apc_usd":6290,"in_doaj":true},{"name":"The Lancet Digital Health","issn":"2589-7500","publisher":"Elsevier","if_proxy":15.4,"apc_usd":5780,"in_doaj":true},{"name":"Diabetes Care","issn":"0149-5992","publisher":"American Diabetes Associatio","if_proxy":12.19,"apc_usd":null,"in_doaj":false},{"name":"The Lancet Oncology","issn":"1470-2045","publisher":"Elsevier","if_proxy":11.11,"apc_usd":6300,"in_doaj":false},{"name":"Journal of Clinical Investigation","issn":"0021-9738","publisher":"American Society for Clinica","if_proxy":9.63,"apc_usd":5200,"in_doaj":true},{"name":"JAMA","issn":"0098-7484","publisher":"American Medical Association","if_proxy":8.56,"apc_usd":null,"in_doaj":false},{"name":"Heliyon","issn":"2405-8440","publisher":"Elsevier","if_proxy":8.37,"apc_usd":2100,"in_doaj":true},{"name":"Proceedings of the National Academy of Sciences","issn":"0027-8424","publisher":"National Academy of Sciences","if_proxy":8.09,"apc_usd":null,"in_doaj":false},{"name":"PLoS Medicine","issn":"1549-1277","publisher":"Public Library of Science","if_proxy":7.78,"apc_usd":6300,"in_doaj":true},{"name":"JAMA Internal Medicine","issn":"2168-6106","publisher":"American Medical Association","if_proxy":6.82,"apc_usd":null,"in_doaj":false},{"name":"Radiology","issn":"0033-8419","publisher":"Radiological Society of Nort","if_proxy":6.0,"apc_usd":null,"in_doaj":false},{"name":"Scientific Reports","issn":"2045-2322","publisher":"Nature Portfolio","if_proxy":4.69,"apc_usd":2390,"in_doaj":true},{"name":"Annals of Internal Medicine","issn":"0003-4819","publisher":"American College of Physicia","if_proxy":4.52,"apc_usd":null,"in_doaj":false},{"name":"BMC Medical Education","issn":"1472-6920","publisher":"BioMed Central","if_proxy":4.51,"apc_usd":2590,"in_doaj":true},{"name":"Medical Teacher","issn":"0142-159X","publisher":"Taylor & Francis","if_proxy":3.9,"apc_usd":null,"in_doaj":false},{"name":"Perspectives on Medical Education","issn":"2212-2761","publisher":"Bohn Stafleu van Loghum","if_proxy":3.53,"apc_usd":null,"in_doaj":true},{"name":"PeerJ","issn":"2167-8359","publisher":"PeerJ, Inc.","if_proxy":3.14,"apc_usd":1395,"in_doaj":true},{"name":"PLoS ONE","issn":"1932-6203","publisher":"Public Library of Science","if_proxy":2.96,"apc_usd":1805,"in_doaj":true},{"name":"Advances in Health Sciences Education","issn":"1382-4996","publisher":"Springer Science+Business Me","if_proxy":2.92,"apc_usd":2890,"in_doaj":false},{"name":"Anesthesiology","issn":"0003-3022","publisher":"Lippincott Williams & Wilkin","if_proxy":2.53,"apc_usd":null,"in_doaj":false},{"name":"Medical Education","issn":"0308-0110","publisher":"Wiley","if_proxy":2.43,"apc_usd":5050,"in_doaj":false},{"name":"BMJ Open","issn":"2044-6055","publisher":"BMJ","if_proxy":2.34,"apc_usd":1839,"in_doaj":true},{"name":"Circulation","issn":"0009-7322","publisher":"Lippincott Williams & Wilkin","if_proxy":2.18,"apc_usd":null,"in_doaj":false},{"name":"Academic Medicine","issn":"1040-2446","publisher":"Lippincott Williams & Wilkin","if_proxy":1.95,"apc_usd":null,"in_doaj":false},{"name":"Teaching and Learning in Medicine","issn":"1040-1334","publisher":"Taylor & Francis","if_proxy":1.88,"apc_usd":null,"in_doaj":false},{"name":"eLife","issn":"2050-084X","publisher":"eLife Sciences Publications ","if_proxy":1.69,"apc_usd":2500,"in_doaj":true},{"name":"Journal of Clinical Oncology","issn":"0732-183X","publisher":"Lippincott Williams & Wilkin","if_proxy":1.58,"apc_usd":null,"in_doaj":false},{"name":"Blood","issn":"0006-4971","publisher":"Elsevier","if_proxy":1.34,"apc_usd":5000,"in_doaj":false},{"name":"Journal of the American College of Cardiology","issn":"0735-1097","publisher":"Elsevier","if_proxy":1.13,"apc_usd":6500,"in_doaj":false},{"name":"Cureus","issn":"2168-8184","publisher":"Cureus, Inc.","if_proxy":1.06,"apc_usd":null,"in_doaj":false},{"name":"CHEST Journal","issn":"0012-3692","publisher":"Elsevier","if_proxy":0.64,"apc_usd":3790,"in_doaj":false},{"name":"Gastroenterology","issn":"0016-5085","publisher":"Elsevier","if_proxy":0.6,"apc_usd":3800,"in_doaj":false},{"name":"American Journal of Respiratory and Critical Care Medicine","issn":"1073-449X","publisher":"American Thoracic Society","if_proxy":0.57,"apc_usd":null,"in_doaj":false},{"name":"BMJ","issn":"0007-1447","publisher":"","if_proxy":null,"apc_usd":null,"in_doaj":false}];
+  var jSearchEl=document.getElementById("jSearch");
+  var jMenuEl=document.getElementById("jMenu");
+  var jDebounce=null, jActive=-1, jCurrent=[];
+  function renderJMenu(list, note){
+    jCurrent=list; jActive=-1;
+    if(!list.length && !note){ jMenuEl.hidden=true; return; }
+    var html=list.map(function(r,i){
+      var meta=[];
+      meta.push(r.if_proxy!=null?("IF~"+r.if_proxy):"IF —");
+      if(r.apc_usd!=null) meta.push("$"+Math.round(r.apc_usd).toLocaleString());
+      if(r.publisher) meta.push(r.publisher);
+      var doaj=r.in_doaj?'<span class="jbadge doaj">DOAJ</span>':'';
+      return '<div class="jitem" data-i="'+i+'"><div class="jn">'+esc(r.name)+'</div>'+
+             '<div class="jmeta">'+esc(meta.join("  ·  "))+doaj+'</div></div>';
+    }).join("");
+    if(note) html+='<div class="jsearch-note">'+esc(note)+'</div>';
+    jMenuEl.innerHTML=html; jMenuEl.hidden=false;
+    jMenuEl.querySelectorAll(".jitem").forEach(function(el){
+      el.addEventListener("mousedown",function(e){e.preventDefault();pickJournal(jCurrent[+el.dataset.i]);});
+    });
+  }
+  function seedMatches(q){
+    q=q.toLowerCase();
+    return JOURNAL_SEED.filter(function(r){return r.name.toLowerCase().indexOf(q)>=0;}).slice(0,8);
+  }
+  function pickJournal(r){
+    if(!r) return;
+    rows.push({name:r.name, if_:(r.if_proxy!=null?r.if_proxy:0), rate:25, fit:3, wk:6, apc:(r.apc_usd!=null?r.apc_usd:0)});
+    if(jSearchEl) jSearchEl.value=""; if(jMenuEl) jMenuEl.hidden=true;
+    render();
+    var tr=tbody.lastElementChild; if(tr) tr.classList.add("jrow-flash");
+  }
+  function doJSearch(q){
+    if(q.length<2){ renderJMenu(JOURNAL_SEED.slice(0,8)); return; }
+    renderJMenu(seedMatches(q));
+    fetch("/api/journals?q="+encodeURIComponent(q))
+      .then(function(r){return r.ok?r.json():Promise.reject();})
+      .then(function(d){
+        var api=(d.results||[]);
+        if(api.length) renderJMenu(api, "OpenAlex 引用代理值,非官方 JIF");
+      })
+      .catch(function(){ renderJMenu(seedMatches(q), "離線或無 API — 顯示內建快取清單"); });
+  }
+  if(jSearchEl){
+    jSearchEl.addEventListener("focus",function(){ if(!jSearchEl.value) renderJMenu(JOURNAL_SEED.slice(0,8)); });
+    jSearchEl.addEventListener("input",function(){
+      clearTimeout(jDebounce); var q=jSearchEl.value.trim();
+      jDebounce=setTimeout(function(){doJSearch(q);},220);
+    });
+    jSearchEl.addEventListener("keydown",function(e){
+      if(jMenuEl.hidden) return;
+      var items=jMenuEl.querySelectorAll(".jitem");
+      if(e.key==="ArrowDown") jActive=Math.min(items.length-1,jActive+1);
+      else if(e.key==="ArrowUp") jActive=Math.max(0,jActive-1);
+      else if(e.key==="Enter"){ if(jActive>=0){e.preventDefault();pickJournal(jCurrent[jActive]);} return; }
+      else if(e.key==="Escape"){ jMenuEl.hidden=true; return; }
+      else return;
+      e.preventDefault();
+      items.forEach(function(el,i){el.classList.toggle("active",i===jActive);});
+      if(items[jActive]) items[jActive].scrollIntoView({block:"nearest"});
+    });
+    document.addEventListener("click",function(e){
+      if(!jSearchEl.contains(e.target) && !jMenuEl.contains(e.target)) jMenuEl.hidden=true;
+    });
+  }
+
   // ---------- tabs (demo navigation) ----------
-  var tabIds=["gates","candidates","verdict","sens","pareto","mc","compare","flow","gantt","method"];
+  var tabIds=["gates","candidates","verdict","sens","pareto","mc","compare","flow","gantt","method","resources"];
   var tabsEls=tabIds.map(function(id){return document.getElementById("t-"+id);});
   var panelsEls=tabIds.map(function(id){return document.getElementById("p-"+id);});
   var prevBtn=document.getElementById("prevTab");
