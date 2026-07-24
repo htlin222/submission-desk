@@ -34,6 +34,7 @@ mkdir -p dist/zh-TW dist/data
 cp index.html dist/index.html
 cp zh-TW/index.html dist/zh-TW/index.html
 cp data/journals-seed.json dist/data/journals-seed.json 2>/dev/null || true
+cp favicon.svg og.png dist/ 2>/dev/null || true
 # Pages Functions must sit at the root of the deployed directory.
 [ -d functions ] && cp -R functions dist/functions
 

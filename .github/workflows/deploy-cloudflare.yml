@@ -25,6 +25,7 @@ jobs:
           cp index.html dist/index.html
           cp zh-TW/index.html dist/zh-TW/index.html
           cp data/journals-seed.json dist/data/journals-seed.json
+          cp favicon.svg og.png dist/
           # Pages Functions must sit at the root of the deployed directory.
           cp -R functions dist/functions
 

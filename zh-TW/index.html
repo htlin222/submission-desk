@@ -4,6 +4,22 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>投稿決策台 —— 期刊選擇的可重現方法</title>
+<meta name="description" content="可重現地決定生醫稿件該投哪本期刊 —— 硬性門檻、計分、排序梯隊,外加假設分析。給臨床與研究者。">
+<meta name="author" content="Submission Desk">
+<meta name="theme-color" content="#0e7a64">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="alternate" hreflang="en" href="https://submission-desk.pages.dev/">
+<link rel="alternate" hreflang="zh-Hant" href="https://submission-desk.pages.dev/zh-TW/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="投稿決策台 Submission Desk">
+<meta property="og:title" content="投稿決策台 — 這份稿子該投哪一本?">
+<meta property="og:description" content="設門檻、算分、排序 —— 可重現的生醫投稿決策引擎,給臨床與研究者。">
+<meta property="og:url" content="https://submission-desk.pages.dev/zh-TW/">
+<meta property="og:image" content="https://submission-desk.pages.dev/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://submission-desk.pages.dev/og.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@500;600;700&family=Noto+Sans+TC:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -299,6 +315,34 @@
 
   /* ---------- analytics (quant modules) ---------- */
   .tab .tnum{width:auto;min-width:20px;padding:0 4px}
+  /* ---------- lucide icons ---------- */
+  .ic{width:1em;height:1em;flex:none;vertical-align:-0.14em;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+  .brand .mark .ic{color:var(--verdict);width:1.05em;height:1.05em;margin-right:2px}
+  .tab .tlab{display:inline-flex;align-items:center;gap:6px}
+  .tab .tlab .ic{opacity:.85}
+  .btn .ic,.stamp .ic{width:1em;height:1em;vertical-align:-.12em;margin-right:4px}
+  .navbtn .ic{width:1.05em;height:1.05em}
+  /* ---------- glossary accordion ---------- */
+  .gloss{display:grid;gap:8px;max-width:840px;margin-top:6px}
+  .gloss details{border:1px solid var(--line);border-radius:8px;background:var(--panel);overflow:hidden}
+  .gloss summary{cursor:pointer;padding:11px 14px;font-weight:600;font-size:13.5px;list-style:none;display:flex;align-items:center;gap:8px}
+  .gloss summary::-webkit-details-marker{display:none}
+  .gloss summary .ic{color:var(--slate-2)}
+  .gloss summary::after{content:"";margin-left:auto;width:7px;height:7px;border-right:2px solid var(--muted);border-bottom:2px solid var(--muted);transform:rotate(45deg);transition:.15s}
+  .gloss details[open] summary::after{transform:rotate(-135deg)}
+  .gloss details[open] summary{border-bottom:1px solid var(--line-soft)}
+  .gloss .gbody{padding:10px 14px 13px;font-size:12.5px;color:#39414f;line-height:1.6}
+  .gloss .gbody code{font-family:var(--mono);font-size:11.5px;background:var(--slate);color:#eef1ee;padding:1px 5px;border-radius:3px}
+  /* ---------- intro (IMRaD) ---------- */
+  .imrad{max-width:860px;overflow:auto;min-height:0}
+  .imrad section{margin-bottom:16px}
+  .imrad h3{font-family:var(--disp);font-size:15px;color:var(--slate);margin:0 0 6px;display:flex;align-items:center;gap:8px}
+  .imrad h3 .ic{color:var(--verdict)}
+  .imrad p{margin:0;font-size:13.5px;line-height:1.65;color:#39414f}
+  .imrad code{font-family:var(--mono);font-size:12px;background:var(--slate);color:#eef1ee;padding:1px 5px;border-radius:3px}
+  .an-legend{flex:none;display:flex;gap:14px;flex-wrap:wrap;font-size:11.5px;color:var(--muted);margin-bottom:8px}
+  .an-legend b{font-weight:600}
+  .an-legend .sw{display:inline-block;width:22px;height:3px;border-radius:2px;vertical-align:middle;margin-right:5px}
   .an-wrap{flex:1;min-height:0;display:flex;flex-direction:column;gap:12px}
   .an-controls{flex:none;display:flex;gap:18px;align-items:center;flex-wrap:wrap;font-size:12.5px;color:var(--slate-2)}
   .an-controls label{display:flex;align-items:center;gap:8px;font-weight:500}
@@ -322,12 +366,13 @@
 </style>
 </head>
 <body>
+<svg xmlns="http://www.w3.org/2000/svg" style="display:none" aria-hidden="true"><symbol id="i-gates" viewBox="0 0 24 24"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z" />  <path d="m9 12 2 2 4-4" /></symbol><symbol id="i-cand" viewBox="0 0 24 24"><path d="M13 5h8" />  <path d="M13 12h8" />  <path d="M13 19h8" />  <path d="m3 17 2 2 4-4" />  <path d="m3 7 2 2 4-4" /></symbol><symbol id="i-verdict" viewBox="0 0 24 24"><path d="M10 14.66v1.626a2 2 0 0 1-.976 1.696A5 5 0 0 0 7 21.978" />  <path d="M14 14.66v1.626a2 2 0 0 0 .976 1.696A5 5 0 0 1 17 21.978" />  <path d="M18 9h1.5a1 1 0 0 0 0-5H18" />  <path d="M4 22h16" />  <path d="M6 9a6 6 0 0 0 12 0V3a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1z" />  <path d="M6 9H4.5a1 1 0 0 1 0-5H6" /></symbol><symbol id="i-sens" viewBox="0 0 24 24"><path d="M21 4H3" />  <path d="M18 8H6" />  <path d="M19 12H9" />  <path d="M16 16h-6" />  <path d="M11 20H9" /></symbol><symbol id="i-pareto" viewBox="0 0 24 24"><path d="M12 3v18" />  <path d="m19 8 3 8a5 5 0 0 1-6 0zV7" />  <path d="M3 7h1a17 17 0 0 0 8-2 17 17 0 0 0 8 2h1" />  <path d="m5 8 3 8a5 5 0 0 1-6 0zV7" />  <path d="M7 21h10" /></symbol><symbol id="i-sim" viewBox="0 0 24 24"><rect width="12" height="12" x="2" y="10" rx="2" ry="2" />  <path d="m17.92 14 3.5-3.5a2.24 2.24 0 0 0 0-3l-5-4.92a2.24 2.24 0 0 0-3 0L10 6" />  <path d="M6 18h.01" />  <path d="M10 14h.01" />  <path d="M15 6h.01" />  <path d="M18 9h.01" /></symbol><symbol id="i-compare" viewBox="0 0 24 24"><path d="M8 3 4 7l4 4" />  <path d="M4 7h16" />  <path d="m16 21 4-4-4-4" />  <path d="M20 17H4" /></symbol><symbol id="i-flow" viewBox="0 0 24 24"><rect width="8" height="8" x="3" y="3" rx="2" />  <path d="M7 11v4a2 2 0 0 0 2 2h4" />  <rect width="8" height="8" x="13" y="13" rx="2" /></symbol><symbol id="i-timeline" viewBox="0 0 24 24"><path d="M16 14v2.2l1.6 1" />  <path d="M16 2v4" />  <path d="M21 7.5V6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h3.5" />  <path d="M3 10h5" />  <path d="M8 2v4" />  <circle cx="16" cy="16" r="6" /></symbol><symbol id="i-method" viewBox="0 0 24 24"><path d="M18 7V5a1 1 0 0 0-1-1H6.5a.5.5 0 0 0-.4.8l4.5 6a2 2 0 0 1 0 2.4l-4.5 6a.5.5 0 0 0 .4.8H17a1 1 0 0 0 1-1v-2" /></symbol><symbol id="i-res" viewBox="0 0 24 24"><path d="m16 6 4 14" />  <path d="M12 6v14" />  <path d="M8 8v12" />  <path d="M4 4v16" /></symbol><symbol id="i-search" viewBox="0 0 24 24"><path d="m21 21-4.34-4.34" />  <circle cx="11" cy="11" r="8" /></symbol><symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" />  <path d="M12 16v-4" />  <path d="M12 8h.01" /></symbol><symbol id="i-ext" viewBox="0 0 24 24"><path d="M15 3h6v6" />  <path d="M10 14 21 3" />  <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" /></symbol><symbol id="i-stetho" viewBox="0 0 24 24"><path d="M11 2v2" />  <path d="M5 2v2" />  <path d="M5 3H4a2 2 0 0 0-2 2v4a6 6 0 0 0 12 0V5a2 2 0 0 0-2-2h-1" />  <path d="M8 15a6 6 0 0 0 12 0v-3" />  <circle cx="20" cy="10" r="2" /></symbol><symbol id="i-micro" viewBox="0 0 24 24"><path d="M6 18h8" />  <path d="M3 22h18" />  <path d="M14 22a7 7 0 1 0 0-14h-1" />  <path d="M9 14h2" />  <path d="M9 12a2 2 0 0 1-2-2V6h6v4a2 2 0 0 1-2 2Z" />  <path d="M12 6V3a1 1 0 0 0-1-1H9a1 1 0 0 0-1 1v3" /></symbol><symbol id="i-flask" viewBox="0 0 24 24"><path d="M14 2v6a2 2 0 0 0 .245.96l5.51 10.08A2 2 0 0 1 18 22H6a2 2 0 0 1-1.755-2.96l5.51-10.08A2 2 0 0 0 10 8V2" />  <path d="M6.453 15h11.094" />  <path d="M8.5 2h7" /></symbol><symbol id="i-apc" viewBox="0 0 24 24"><line x1="12" x2="12" y1="2" y2="22" />  <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" /></symbol><symbol id="i-rate" viewBox="0 0 24 24"><line x1="19" x2="5" y1="5" y2="19" />  <circle cx="6.5" cy="6.5" r="2.5" />  <circle cx="17.5" cy="17.5" r="2.5" /></symbol><symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" />  <path d="M12 6v6l4 2" /></symbol><symbol id="i-fit" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" />  <circle cx="12" cy="12" r="6" />  <circle cx="12" cy="12" r="2" /></symbol><symbol id="i-plus" viewBox="0 0 24 24"><path d="M5 12h14" />  <path d="M12 5v14" /></symbol><symbol id="i-trash" viewBox="0 0 24 24"><path d="M10 11v6" />  <path d="M14 11v6" />  <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6" />  <path d="M3 6h18" />  <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" /></symbol><symbol id="i-check" viewBox="0 0 24 24"><path d="M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76Z" />  <path d="m9 12 2 2 4-4" /></symbol><symbol id="i-send" viewBox="0 0 24 24"><path d="M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11z" />  <path d="m21.854 2.147-10.94 10.939" /></symbol><symbol id="i-pulse" viewBox="0 0 24 24"><path d="M2 9.5a5.5 5.5 0 0 1 9.591-3.676.56.56 0 0 0 .818 0A5.49 5.49 0 0 1 22 9.5c0 2.29-1.5 4-3 5.5l-5.492 5.313a2 2 0 0 1-3 .019L5 15c-1.5-1.5-3-3.2-3-5.5" />  <path d="M3.22 13H9.5l.5-1 2 4.5 2-7 1.5 3.5h5.27" /></symbol><symbol id="i-book" viewBox="0 0 24 24"><path d="M12 5v16" />  <path d="m16 12 2 2 4-4" />  <path d="M22 6V5a2 2 0 00-1.999-2L16 3.002A5 5 0 0012 5a5 5 0 00-4-2H4a2 2 0 00-2 2v12a2 2 0 001.999 2H8a5 5 0 014 2 5 5 0 014-2h4.001A2 2 0 0022 17v-1.344" /></symbol><symbol id="i-alert" viewBox="0 0 24 24"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z" />  <path d="M12 8v4" />  <path d="M12 16h.01" /></symbol><symbol id="i-spark" viewBox="0 0 24 24"><path d="M11.017 2.814a1 1 0 0 1 1.966 0l1.051 5.558a2 2 0 0 0 1.594 1.594l5.558 1.051a1 1 0 0 1 0 1.966l-5.558 1.051a2 2 0 0 0-1.594 1.594l-1.051 5.558a1 1 0 0 1-1.966 0l-1.051-5.558a2 2 0 0 0-1.594-1.594l-5.558-1.051a1 1 0 0 1 0-1.966l5.558-1.051a2 2 0 0 0 1.594-1.594z" />  <path d="M20 2v4" />  <path d="M22 4h-4" />  <circle cx="4" cy="20" r="2" /></symbol><symbol id="i-cleft" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6" /></symbol><symbol id="i-cright" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6" /></symbol></svg>
 
   <!-- ===== app bar ===== -->
   <header class="appbar">
     <div class="brand">
-      <span class="mark">投稿<em>決策台</em></span>
-      <span class="kicker">期刊選擇的可重現方法</span>
+      <span class="mark"><svg class="ic"><use href="#i-pulse"/></svg>投稿<em>決策台</em></span>
+      <span class="kicker">生醫投稿決策 · 給臨床與研究者</span>
     </div>
     <div class="spacer"></div>
     <nav class="langnav"><a href="../">EN</a><span aria-current="true">繁中</span></nav>
@@ -335,30 +380,42 @@
 
   <!-- ===== tab bar ===== -->
   <nav class="tabbar" role="tablist" aria-label="步驟" id="tabbar">
-    <button class="tab" role="tab" aria-selected="true"  aria-controls="p-gates"      id="t-gates"><span class="tnum">1</span><span class="tlab">門檻</span></button>
-    <button class="tab" role="tab" aria-selected="false" aria-controls="p-candidates" id="t-candidates"><span class="tnum">2</span><span class="tlab">候選</span></button>
-    <button class="tab" role="tab" aria-selected="false" aria-controls="p-verdict"    id="t-verdict"><span class="tnum">3</span><span class="tlab">排序</span></button>
-    <button class="tab" role="tab" aria-selected="false" aria-controls="p-sens"       id="t-sens"><span class="tnum">4</span><span class="tlab">敏感度</span></button>
-    <button class="tab" role="tab" aria-selected="false" aria-controls="p-pareto"     id="t-pareto"><span class="tnum">5</span><span class="tlab">權衡</span></button>
-    <button class="tab" role="tab" aria-selected="false" aria-controls="p-mc"         id="t-mc"><span class="tnum">6</span><span class="tlab">模擬</span></button>
-    <button class="tab" role="tab" aria-selected="false" aria-controls="p-compare"    id="t-compare"><span class="tnum">7</span><span class="tlab">對照</span></button>
-    <button class="tab" role="tab" aria-selected="false" aria-controls="p-flow"       id="t-flow"><span class="tnum">8</span><span class="tlab">流程</span></button>
-    <button class="tab" role="tab" aria-selected="false" aria-controls="p-gantt"      id="t-gantt"><span class="tnum">9</span><span class="tlab">時程</span></button>
-    <button class="tab" role="tab" aria-selected="false" aria-controls="p-method"     id="t-method"><span class="tnum">10</span><span class="tlab">方法</span></button>
-    <button class="tab" role="tab" aria-selected="false" aria-controls="p-resources"  id="t-resources"><span class="tnum">11</span><span class="tlab">資源</span></button>
+    <button class="tab" role="tab" aria-selected="true"  aria-controls="p-intro"      id="t-intro"><span class="tnum">1</span><span class="tlab"><svg class="ic"><use href="#i-spark"/></svg>導言</span></button>
+    <button class="tab" role="tab" aria-selected="false" aria-controls="p-gates"       id="t-gates"><span class="tnum">2</span><span class="tlab"><svg class="ic"><use href="#i-gates"/></svg>門檻</span></button>
+    <button class="tab" role="tab" aria-selected="false" aria-controls="p-candidates"  id="t-candidates"><span class="tnum">3</span><span class="tlab"><svg class="ic"><use href="#i-cand"/></svg>候選</span></button>
+    <button class="tab" role="tab" aria-selected="false" aria-controls="p-verdict"     id="t-verdict"><span class="tnum">4</span><span class="tlab"><svg class="ic"><use href="#i-verdict"/></svg>排序</span></button>
+    <button class="tab" role="tab" aria-selected="false" aria-controls="p-sens"        id="t-sens"><span class="tnum">5</span><span class="tlab"><svg class="ic"><use href="#i-sens"/></svg>敏感度</span></button>
+    <button class="tab" role="tab" aria-selected="false" aria-controls="p-pareto"      id="t-pareto"><span class="tnum">6</span><span class="tlab"><svg class="ic"><use href="#i-pareto"/></svg>權衡</span></button>
+    <button class="tab" role="tab" aria-selected="false" aria-controls="p-mc"          id="t-mc"><span class="tnum">7</span><span class="tlab"><svg class="ic"><use href="#i-sim"/></svg>模擬</span></button>
+    <button class="tab" role="tab" aria-selected="false" aria-controls="p-compare"     id="t-compare"><span class="tnum">8</span><span class="tlab"><svg class="ic"><use href="#i-compare"/></svg>對照</span></button>
+    <button class="tab" role="tab" aria-selected="false" aria-controls="p-flow"        id="t-flow"><span class="tnum">9</span><span class="tlab"><svg class="ic"><use href="#i-flow"/></svg>流程</span></button>
+    <button class="tab" role="tab" aria-selected="false" aria-controls="p-gantt"       id="t-gantt"><span class="tnum">10</span><span class="tlab"><svg class="ic"><use href="#i-timeline"/></svg>時程</span></button>
+    <button class="tab" role="tab" aria-selected="false" aria-controls="p-method"      id="t-method"><span class="tnum">11</span><span class="tlab"><svg class="ic"><use href="#i-method"/></svg>方法</span></button>
+    <button class="tab" role="tab" aria-selected="false" aria-controls="p-resources"   id="t-resources"><span class="tnum">12</span><span class="tlab"><svg class="ic"><use href="#i-res"/></svg>資源</span></button>
     <div class="spacer"></div>
     <div class="stepnav">
-      <button class="navbtn" id="prevTab" aria-label="上一步">&lsaquo;</button>
-      <span><b id="stepNow">1</b> / 11</span>
-      <button class="navbtn" id="nextTab" aria-label="下一步">&rsaquo;</button>
+      <button class="navbtn" id="prevTab" aria-label="上一步"><svg class="ic"><use href="#i-cleft"/></svg></button>
+      <span><b id="stepNow">1</b> / 12</span>
+      <button class="navbtn" id="nextTab" aria-label="下一步"><svg class="ic"><use href="#i-cright"/></svg></button>
     </div>
   </nav>
 
   <!-- ===== stage ===== -->
   <main class="stage">
 
-    <!-- 1 GATES -->
-    <section class="tabpanel active" id="p-gates" role="tabpanel" aria-labelledby="t-gates" tabindex="0">
+    <!-- 1 INTRO -->
+    <section class="tabpanel active" id="p-intro" role="tabpanel" aria-labelledby="t-intro" tabindex="0">
+      <div class="phead"><h2>這個決策台在做什麼</h2><p>用一分鐘,以論文的 IMRaD 結構帶你看懂。</p></div>
+      <div class="pbody"><div class="imrad scroller">
+        <section><h3><svg class="ic"><use href="#i-stetho"/></svg>引言 Introduction</h3><p>稿子寫完了,該投哪?對臨床與生醫研究者,選期刊常是憑感覺、或沿著影響因子清單往下走。投稿決策台把它變成一套<b>可重現的流程</b>:設門檻、算分、排序 —— 同樣輸入永遠同樣答案。</p></section>
+        <section><h3><svg class="ic"><use href="#i-method"/></svg>方法 Methods</h3><p>三步驟。<b>硬性門檻</b>:五個是非題,錯一項該刊即出局。<b>計分</b>:接受機率 = 公布接受率 × 你的契合度;再以<b>期望產出</b>(每月拿得到的影響力)或<b>平衡加權</b>混合排序。<code>接受機率 = clamp(接受率 × 契合, 0.02, 0.95)</code> · <code>EIM = 接受機率 × IF / 月數</code>。</p></section>
+        <section><h3><svg class="ic"><use href="#i-verdict"/></svg>結果 Results</h3><p>一份排好名次、標出首選的清單,外加多種假設分析 —— 敏感度、權衡(Pareto)、蒙地卡羅穩健性、雙模式對照 —— 以及一張時程,呈現「衝一本高分刊」真正要花的週數。</p></section>
+        <section><h3><svg class="ic"><use href="#i-flask"/></svg>討論與證據 Discussion</h3><p>盡量有根據:重視契合度使首投命中率約<b>翻倍</b>(Rees 2022,OR 2.11);產出公式是 Salinas 與 Munch(2015)馬可夫模型的簡化。未校準處都有標示,自動帶入的 IF 是<b>策展近似值</b> —— 官方 JIF 請於 JCR 查證。這是初篩工具,不能取代實際閱讀期刊。生疏術語見<b>方法 → 詞彙表</b>。</p></section>
+      </div></div>
+    </section>
+
+    <!-- 2 GATES -->
+    <section class="tabpanel" id="p-gates" role="tabpanel" aria-labelledby="t-gates" tabindex="0">
       <div class="phead"><h2>硬性門檻</h2><p>五項全數通過才進入計分。取消任何一項 &rarr; 直接出局,不再討論。</p></div>
       <div class="pbody">
         <ul class="gates scroller" id="gateList"></ul>
@@ -462,8 +519,9 @@
 
     <!-- 7 COMPARE -->
     <section class="tabpanel" id="p-compare" role="tabpanel" aria-labelledby="t-compare" tabindex="0">
-      <div class="phead"><h2>雙模式排名對照</h2><p>左為期望產出、右為平衡加權,連線標出名次變動。</p></div>
+      <div class="phead"><h2>雙模式排名對照(bump chart)</h2><p>同一份稿子,兩種排序法名次未必相同。連線把「同一本期刊」的兩個名次接起來 —— 線交叉＝兩法分歧。</p></div>
       <div class="pbody"><div class="an-wrap">
+        <div class="an-legend"><span><span class="sw" style="background:#0e7a64"></span><b>綠</b>=平衡模式名次上升</span><span><span class="sw" style="background:#a03434"></span><b>紅</b>=下降</span><span><span class="sw" style="background:#6a7180"></span><b>灰</b>=不變</span></div>
         <div id="cmpChart" class="an-host"></div>
         <p class="an-note"><b style="color:#0e7a64">綠線</b>=在平衡模式名次上升、<b style="color:#a03434">紅線</b>=下降、<b style="color:#6a7180">灰線</b>=不變。交叉越多代表兩種方法分歧越大,越該回頭檢視權重設定。</p>
       </div></div>
@@ -504,6 +562,21 @@
           <h3>證據來源</h3>
           <p>「契合度優先」依據 Rees 等<sup><a href="#ref1">1</a></sup>(<i>Perspect Med Educ</i>,2022;n=691):重視契合度使首投命中勝算比達 2.11(95% CI 1.55–2.88),重視影響力則降至 0.37。時程預設值取自同一份調查。期望產出公式是 Salinas 與 Munch<sup><a href="#ref2">2</a></sup>(<i>PLoS One</i>,2015)之馬可夫決策模型的簡化版。</p>
           <p>標示 <span class="flag">未校準</span> 者為作者自訂、未經驗證的參數。</p>
+          <h3>詞彙表</h3>
+          <div class="gloss">
+            <details><summary><svg class="ic"><use href="#i-gates"/></svg>硬性門檻</summary><div class="gbody">二元、不可妥協的資格檢查(主題、索引、正當性、APC、文章類型)。任一門檻未過即在計分前被剔除 —— 聲望買不回失敗的門檻。</div></details>
+            <details><summary><svg class="ic"><use href="#i-info"/></svg>影響因子(IF / JIF)</summary><div class="gbody">期刊影響因子:近期每篇可引用文章的平均被引數,由 Clarivate 於 <code>JCR</code> 發布。本工具對主要期刊自動帶入策展近似值;精確值請至 JCR 查得後手填。</div></details>
+            <details><summary><svg class="ic"><use href="#i-apc"/></svg>APC</summary><div class="gbody">文章處理費 —— 部分期刊為開放取用收取的費用(美元)。可用資源分頁的 Taylor &amp; Francis Cost Finder 查詢。</div></details>
+            <details><summary><svg class="ic"><use href="#i-check"/></svg>DOAJ</summary><div class="gbody">開放取用期刊指南 —— 經審核的白名單。列於其中是對抗掠奪型期刊的正面正當性訊號。</div></details>
+            <details><summary><svg class="ic"><use href="#i-fit"/></svg>契合度(1–5)</summary><div class="gbody">你的稿子與該刊的吻合程度:主題 × 新穎性 × 嚴謹度,對照該刊的門檻。首投命中的最強預測因子。請在看影響因子之前先評分。</div></details>
+            <details><summary><svg class="ic"><use href="#i-rate"/></svg>接受機率</summary><div class="gbody">模型推算的接受機率 = <code>clamp(接受率 × 契合係數, 0.02, 0.95)</code>。是校準估計,不是保證。</div></details>
+            <details><summary><svg class="ic"><use href="#i-verdict"/></svg>期望產出(EIM)</summary><div class="gbody">以「每月拿得到的影響力」排序:<code>EIM = 接受機率 × IF /(週數/4.345)</code>。懲罰那些既難上、又拖很久才決定的期刊。</div></details>
+            <details><summary><svg class="ic"><use href="#i-sens"/></svg>平衡加權</summary><div class="gbody">把聲望、接受機率、速度、成本正規化後依權重混合。分數僅相對於目前候選清單。</div></details>
+            <details><summary><svg class="ic"><use href="#i-pareto"/></svg>權衡前緣(Pareto)</summary><div class="gbody">在權衡圖中,沒有被另一本「同時更快又更高影響」支配的期刊。被支配(灰色)的通常就是那本冒險的衝刺刊。</div></details>
+            <details><summary><svg class="ic"><use href="#i-sim"/></svg>蒙地卡羅</summary><div class="gbody">用你的輸入加上擾動(固定種子、可重現)重跑排序數千次,看每本期刊「其實排第一」的頻率 —— 也就是首選有多穩健。</div></details>
+            <details><summary><svg class="ic"><use href="#i-compare"/></svg>bump chart(名次連線圖)</summary><div class="gbody">雙模式對照:每本期刊在期望產出(左)的名次,用連線接到它在平衡加權(右)的名次。線交叉代表兩種方法意見分歧。</div></details>
+            <details><summary><svg class="ic"><use href="#i-alert"/></svg>掠奪型期刊</summary><div class="gbody">收錢就刊、幾乎沒有真正同儕審查的期刊。投稿前請用資源分頁的 DOAJ 與 Think-Check-Submit 篩查。</div></details>
+          </div>
           <h3>參考文獻</h3>
           <ol class="refs">
             <li id="ref1">Rees EL, Burton O, Asif A, Eva KW. A method for the madness: an international survey of health professions education authors&rsquo; journal choice. <i>Perspect Med Educ</i>. 2022;11(3):165-172. doi:<a href="https://doi.org/10.1007/s40037-022-00698-9" target="_blank" rel="noopener">10.1007/s40037-022-00698-9</a></li>
@@ -679,7 +752,7 @@ var MSG={
       div.innerHTML=
         '<div class="vrank">'+String(idx+1).padStart(2,"0")+'</div>'+
         '<div class="vmid"><div class="vname">'+esc(r.name||"—")+
-          (top?'<span class="stamp">→ 投這本</span>':'')+'</div>'+
+          (top?'<span class="stamp"><svg class="ic"><use href="#i-send"/></svg>投這本</span>':'')+'</div>'+
           '<div class="vbar-track"><div class="vbar" style="width:'+pct+'%"></div></div>'+
           '<div class="vmeta">IF '+r.if_+'  ·  接受機率 '+(pAccept(r)*100).toFixed(0)+'%  ·  '+r.wk+' 週  ·  $'+fmt(r.apc)+'</div>'+
         '</div>'+
@@ -1065,7 +1138,7 @@ var MSG={
   }
 
   // ---------- tabs (demo navigation) ----------
-  var tabIds=["gates","candidates","verdict","sens","pareto","mc","compare","flow","gantt","method","resources"];
+  var tabIds=["intro","gates","candidates","verdict","sens","pareto","mc","compare","flow","gantt","method","resources"];
   var tabsEls=tabIds.map(function(id){return document.getElementById("t-"+id);});
   var panelsEls=tabIds.map(function(id){return document.getElementById("p-"+id);});
   var prevBtn=document.getElementById("prevTab");
