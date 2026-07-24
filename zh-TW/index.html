@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="zh-Hant-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>投稿決策台 —— 期刊選擇的可重現方法</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@500;600;700&family=Noto+Sans+TC:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#171a21;
+    --canvas:#e6e7e1;
+    --panel:#fcfcfa;
+    --panel-2:#f2f3ee;
+    --line:#d2d4cb;
+    --line-soft:#e2e3dc;
+    --slate:#223049;
+    --slate-2:#3a4d70;
+    --verdict:#0e7a64;
+    --verdict-soft:#0e7a6414;
+    --caution:#9a6a2e;
+    --caution-soft:#9a6a2e14;
+    --reject:#a03434;
+    --muted:#6a7180;
+    --mono:'IBM Plex Mono','Noto Sans TC',ui-monospace,monospace;
+    --disp:'Noto Serif TC',serif;
+    --body:'Noto Sans TC',system-ui,sans-serif;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0;background:var(--canvas);color:var(--ink);
+    font-family:var(--body);font-size:15px;line-height:1.75;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:1080px;margin:0 auto;padding:0 20px 80px}
+
+  .topbar{display:flex;justify-content:space-between;align-items:flex-start;gap:16px}
+  .langnav{font-family:var(--mono);font-size:11px;display:flex;gap:10px;align-items:center;flex:none}
+  .langnav span{color:var(--ink);font-weight:700;border-bottom:1.5px solid var(--verdict);padding-bottom:2px}
+  .langnav a{color:var(--muted);text-decoration:none;padding-bottom:2px;border-bottom:1.5px solid transparent}
+  .langnav a:hover{color:var(--ink);border-bottom-color:var(--line)}
+  .flag{font-family:var(--mono);font-size:9.5px;letter-spacing:.04em;
+    color:var(--caution);background:var(--caution-soft);border:1px solid var(--caution);
+    padding:1px 5px;border-radius:3px;vertical-align:middle;white-space:nowrap;font-weight:600}
+  header.masthead{border-bottom:2px solid var(--ink);padding:34px 0 24px;margin-bottom:8px}
+  .kicker{
+    font-family:var(--mono);font-size:11.5px;letter-spacing:.12em;
+    color:var(--slate-2);margin:0 0 14px;
+  }
+  h1{
+    font-family:var(--disp);font-weight:700;font-size:clamp(30px,5vw,46px);
+    line-height:1.22;letter-spacing:-.01em;margin:0 0 16px;
+  }
+  h1 em{font-style:normal;color:var(--verdict)}
+  .thesis{max-width:660px;color:#39414f;font-size:15.5px;margin:0}
+  .thesis code{
+    font-family:var(--mono);font-size:13px;background:var(--slate);
+    color:#eef1ee;padding:1px 6px;border-radius:3px;
+  }
+
+  section{margin-top:38px}
+  .shead{display:flex;align-items:baseline;gap:14px;margin-bottom:16px}
+  .snum{
+    font-family:var(--mono);font-size:12px;font-weight:600;color:var(--panel);
+    background:var(--slate);width:26px;height:26px;flex:none;
+    display:grid;place-items:center;border-radius:4px;margin-top:4px;
+  }
+  .shead h2{font-family:var(--disp);font-weight:700;font-size:21px;margin:0;line-height:1.4}
+  .shead p{margin:2px 0 0;color:var(--muted);font-size:13.5px;line-height:1.6}
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:20px}
+
+  .gates{list-style:none;margin:0;padding:0;display:grid;gap:2px}
+  .gates li{
+    display:flex;align-items:flex-start;gap:12px;padding:11px 12px;border-radius:7px;
+    cursor:pointer;transition:background .12s;
+  }
+  .gates li:hover{background:var(--panel-2)}
+  .gates input{
+    appearance:none;-webkit-appearance:none;width:20px;height:20px;flex:none;margin-top:4px;
+    border:1.6px solid var(--caution);border-radius:5px;background:var(--panel);
+    cursor:pointer;position:relative;transition:.12s;
+  }
+  .gates input:checked{background:var(--verdict);border-color:var(--verdict)}
+  .gates input:checked::after{
+    content:"";position:absolute;left:6px;top:2px;width:5px;height:10px;
+    border:solid var(--panel);border-width:0 2.2px 2.2px 0;transform:rotate(45deg);
+  }
+  .gates input:focus-visible{outline:2px solid var(--slate-2);outline-offset:2px}
+  .gate-txt strong{font-weight:700;display:block;font-size:14.5px;line-height:1.6}
+  .gate-txt span{color:var(--muted);font-size:12.5px;line-height:1.6}
+
+  .tbl-scroll{overflow-x:auto;border:1px solid var(--line);border-radius:10px;background:var(--panel)}
+  table{border-collapse:collapse;width:100%;min-width:760px}
+  thead th{
+    font-family:var(--mono);font-size:11px;letter-spacing:.04em;
+    color:var(--slate-2);text-align:left;padding:12px 10px;font-weight:600;
+    border-bottom:1.5px solid var(--line);white-space:nowrap;background:var(--panel-2);
+  }
+  thead th abbr{text-decoration:none;border-bottom:1px dotted var(--muted);cursor:help}
+  tbody td{padding:6px 8px;border-bottom:1px solid var(--line-soft);vertical-align:middle}
+  tbody tr:last-child td{border-bottom:none}
+  .jname{
+    font-family:var(--body);font-weight:500;font-size:14px;width:100%;border:none;
+    background:transparent;padding:6px;border-radius:5px;color:var(--ink);
+  }
+  .jname:focus{background:var(--panel-2);outline:1px solid var(--slate-2)}
+  .cell{
+    font-family:var(--mono);font-size:13px;width:68px;text-align:right;
+    border:1px solid transparent;background:var(--panel-2);border-radius:5px;
+    padding:6px 7px;color:var(--ink);
+  }
+  .cell:focus{outline:none;border-color:var(--slate-2);background:var(--panel)}
+  .cell.fit{width:54px}
+  .out{font-family:var(--mono);font-size:13px;font-weight:500;text-align:right;color:var(--slate)}
+  .out.big{font-weight:600}
+  .rm{border:none;background:transparent;color:var(--muted);cursor:pointer;font-size:17px;
+    line-height:1;padding:4px 6px;border-radius:5px}
+  .rm:hover{background:#f0d9d9;color:var(--reject)}
+  .tbl-actions{display:flex;gap:10px;align-items:center;margin-top:14px;flex-wrap:wrap}
+  .btn{
+    font-family:var(--body);font-weight:500;font-size:13.5px;border-radius:7px;cursor:pointer;
+    padding:8px 14px;border:1px solid var(--slate);background:var(--slate);color:var(--panel);transition:.12s;
+  }
+  .btn:hover{background:var(--slate-2);border-color:var(--slate-2)}
+  .btn.ghost{background:transparent;color:var(--slate);border-color:var(--line)}
+  .btn.ghost:hover{background:var(--panel-2)}
+  .btn:focus-visible{outline:2px solid var(--slate-2);outline-offset:2px}
+
+  .weights{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:16px 22px;margin-top:6px}
+  .wrow label{display:flex;justify-content:space-between;font-size:12.5px;color:var(--slate-2);margin-bottom:5px;font-weight:500}
+  .wrow label b{font-family:var(--mono);font-weight:600;color:var(--ink)}
+  input[type=range]{width:100%;accent-color:var(--slate);cursor:pointer}
+  .mode-toggle{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:var(--panel-2)}
+  .mode-toggle button{
+    font-family:var(--body);font-size:12.5px;border:none;background:transparent;
+    padding:8px 15px;cursor:pointer;color:var(--muted);font-weight:500;
+  }
+  .mode-toggle button.on{background:var(--slate);color:var(--panel);font-weight:700}
+
+  .verdict-list{display:grid;gap:10px}
+  .vrow{
+    display:grid;grid-template-columns:22px 1fr auto;align-items:center;gap:14px;
+    padding:14px 16px;border:1px solid var(--line);border-radius:9px;background:var(--panel);
+  }
+  .vrow.top{border-color:var(--verdict);border-width:1.5px;background:var(--verdict-soft)}
+  .vrank{font-family:var(--mono);font-size:13px;font-weight:600;color:var(--muted)}
+  .vrow.top .vrank{color:var(--verdict)}
+  .vmid{min-width:0}
+  .vname{font-weight:700;font-size:15px;display:flex;align-items:center;gap:9px;flex-wrap:wrap;line-height:1.5}
+  .stamp{
+    font-family:var(--body);font-size:11px;letter-spacing:.06em;color:var(--panel);
+    background:var(--verdict);padding:3px 9px;border-radius:3px;font-weight:700;
+  }
+  .vbar-track{height:7px;background:var(--panel-2);border-radius:4px;margin-top:9px;overflow:hidden}
+  .vbar{height:100%;background:var(--slate-2);border-radius:4px;transition:width .35s ease}
+  .vrow.top .vbar{background:var(--verdict)}
+  .vmeta{font-family:var(--mono);font-size:11.5px;color:var(--muted);margin-top:7px}
+  .vscore{font-family:var(--mono);font-weight:600;font-size:21px;text-align:right;color:var(--slate);white-space:nowrap;line-height:1.2}
+  .vrow.top .vscore{color:var(--verdict)}
+  .vscore small{display:block;font-family:var(--body);font-size:10.5px;font-weight:500;color:var(--muted);margin-top:2px}
+  .no-verdict{color:var(--muted);padding:10px 2px;font-size:14px}
+
+  .flow{display:flex;flex-wrap:wrap;gap:8px;align-items:stretch}
+  .fstep{flex:1 1 128px;min-width:118px;border:1px solid var(--line);border-radius:8px;background:var(--panel);padding:11px 12px}
+  .fstep .fn{font-family:var(--mono);font-size:10px;color:var(--muted)}
+  .fstep .fl{font-weight:700;font-size:13.5px;margin-top:2px}
+  .fstep .fd{font-size:11.5px;color:var(--muted);margin-top:4px;line-height:1.55}
+  .fstep.decision{border-color:var(--caution);background:var(--caution-soft)}
+  .fstep.accept{border-color:var(--verdict);background:var(--verdict-soft)}
+  .branch{
+    display:flex;gap:8px;align-items:center;font-size:12.5px;line-height:1.7;
+    color:var(--reject);margin-top:14px;padding:11px 14px;border:1px dashed var(--reject);
+    border-radius:8px;background:#fbf3f3;
+  }
+  .branch b{color:var(--reject)}
+
+  .gantt-head{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:14px}
+  .gtotal{font-size:13.5px;color:var(--slate)}
+  .gtotal b{font-family:var(--mono);font-size:17px;color:var(--verdict)}
+  .grid{display:grid;grid-template-columns:158px 1fr;gap:0 12px;align-items:center}
+  .glabel{font-size:12.5px;font-weight:500;padding:7px 0;display:flex;align-items:center;gap:8px}
+  .glabel input{
+    width:44px;font-family:var(--mono);font-size:12px;text-align:right;border:1px solid var(--line);
+    background:var(--panel);border-radius:4px;padding:3px 5px;color:var(--ink);
+  }
+  .glabel input:focus{outline:none;border-color:var(--slate-2)}
+  .gtrack{position:relative;height:26px;background:var(--panel-2);border-radius:4px;overflow:hidden}
+  .gbar{position:absolute;top:3px;height:20px;border-radius:3px;display:flex;align-items:center;
+    padding:0 8px;font-family:var(--mono);font-size:10.5px;color:var(--panel);white-space:nowrap;
+    transition:left .3s ease,width .3s ease}
+  .gaxis{display:grid;grid-template-columns:158px 1fr;gap:0 12px;margin-top:6px}
+  .gaxis .ticks{position:relative;height:16px;font-family:var(--mono);font-size:10px;color:var(--muted)}
+  .gtick{position:absolute;transform:translateX(-50%);top:0}
+  .cascade-row{display:flex;align-items:center;gap:9px;font-size:13px;cursor:pointer}
+  .cascade-row input{width:18px;height:18px;accent-color:var(--slate)}
+
+  footer{margin-top:46px;border-top:1px solid var(--line);padding-top:22px;color:var(--muted);font-size:12.5px;line-height:1.85}
+  footer h3{font-family:var(--disp);font-size:15px;color:var(--slate);margin:0 0 10px}
+  footer p{margin:0 0 10px;max-width:780px}
+  footer code{font-family:var(--mono);font-size:11.5px;color:var(--slate)}
+
+  @media (max-width:620px){
+    .grid,.gaxis{grid-template-columns:104px 1fr}
+    .glabel{font-size:11.5px}
+    .vrow{grid-template-columns:20px 1fr;grid-template-rows:auto auto}
+    .vscore{grid-column:2;text-align:left;margin-top:8px}
+  }
+  @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="masthead">
+    <div class="topbar"><p class="kicker">投稿決策台 · 可重現的方法</p><nav class="langnav"><a href="../">EN</a><span aria-current="true">繁中</span></nav></div>
+    <h1>這份稿子<br>該投<em>哪一本?</em></h1>
+    <p class="thesis">先設門檻、再算分、最後排序 —— 同樣的輸入永遠得到同樣的答案。核心是 <code>EIM =(接受機率 × IF)÷ 月數</code>,讓「其實吃不到、又拖很久」的高分刊自動退位。</p>
+  </header>
+
+  <section id="gates">
+    <div class="shead">
+      <span class="snum">1</span>
+      <div><h2>硬性門檻</h2><p>五項全數通過才進入計分。取消任何一項 → 直接出局,不再討論。</p></div>
+    </div>
+    <div class="panel"><ul class="gates" id="gateList"></ul></div>
+  </section>
+
+  <section id="candidates">
+    <div class="shead">
+      <span class="snum">2</span>
+      <div><h2>候選期刊</h2><p>每一格都可以直接改。契合度是 1–5 分的評分準則:主題吻合 × 新穎性 × 嚴謹度,對照該刊的門檻。</p></div>
+    </div>
+    <div class="tbl-scroll">
+      <table>
+        <thead><tr>
+          <th style="width:100%">期刊</th>
+          <th><abbr title="影響因子,或該領域的百分位。純粹的聲望值">IF</abbr></th>
+          <th><abbr title="該刊公布的接受率(%)">接受率&nbsp;%</abbr></th>
+          <th><abbr title="你的契合度 1–5。用來修正接受機率:1×0.5、3×1.0、5×1.6。這組係數未經校準。">契合</abbr> <span class="flag">未校準</span></th>
+          <th><abbr title="到首次決議所需的週數">週</abbr></th>
+          <th><abbr title="文章處理費 Article Processing Charge">APC</abbr></th>
+          <th><abbr title="模型推算的接受機率">接受機率</abbr></th>
+          <th><abbr title="目前模式下的排序分數">分數</abbr></th>
+          <th></th>
+        </tr></thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+    <div class="tbl-actions">
+      <button class="btn" id="addRow">＋ 新增期刊</button>
+      <button class="btn ghost" id="resetRows">還原範例</button>
+      <div class="mode-toggle" role="group" aria-label="排序模式" style="margin-left:auto">
+        <button id="modeEIM" class="on">期望產出</button>
+        <button id="modeBal">平衡加權</button>
+      </div>
+    </div>
+
+    <div class="panel" style="margin-top:16px">
+      <label style="font-size:12.5px;color:var(--slate-2);font-weight:700;display:block;margin-bottom:12px">平衡加權模式的權重 <span class="flag">未校準</span> <span style="color:var(--muted);font-weight:400">(自動正規化;期望產出模式下不使用;分數僅在本候選清單內可比)</span></label>
+      <div class="weights" id="weights"></div>
+    </div>
+  </section>
+
+  <section id="verdict">
+    <div class="shead">
+      <span class="snum">3</span>
+      <div><h2>排序結果</h2><p>可重現的名次。第一名蓋上印章,長條圖以領先者為基準。</p></div>
+    </div>
+    <div class="verdict-list" id="verdictList"></div>
+  </section>
+
+  <section id="flow">
+    <div class="shead">
+      <span class="snum">4</span>
+      <div><h2>流程與狀態</h2><p>狀態固定不漂移。被拒就回到梯隊上的下一本,不必重新煩惱。</p></div>
+    </div>
+    <div class="panel">
+      <div class="flow" id="flowSteps"></div>
+      <div class="branch">↩&nbsp; 若為<b>拒稿</b>:回到「排版」,直接換上梯隊第二順位的期刊 —— 不必重新思考,排序早就替你選好了。</div>
+    </div>
+  </section>
+
+  <section id="gantt">
+    <div class="shead">
+      <span class="snum">5</span>
+      <div><h2>時程甘特圖</h2><p>典型時長,週數可改。這裡才看得出「衝一本高分刊」真正的代價。</p></div>
+    </div>
+    <div class="panel">
+      <div class="gantt-head">
+        <div class="gtotal">從備稿到刊出:<b id="ganttTotal">0</b> 週</div>
+        <label class="cascade-row"><input type="checkbox" id="cascade"> 加入一次「被拒 + 改投」的循環</label>
+      </div>
+      <div class="grid" id="ganttGrid"></div>
+      <div class="gaxis"><div></div><div class="ticks" id="ganttTicks"></div></div>
+    </div>
+  </section>
+
+  <footer>
+    <h3>數字是怎麼算的</h3>
+    <p><code>接受機率 = clamp((接受率 ÷ 100)× 契合係數, 0.02, 0.95)</code>,契合係數對應 1–5 分依序為 0.5 / 0.75 / 1.0 / 1.3 / 1.6。</p>
+    <p><b>期望產出</b>以 <code>EIM = 接受機率 × IF ÷(週數 ÷ 4.345)</code> 排序,也就是「每月實際拿得到的影響力」。<b>平衡加權</b>則是把聲望、接受機率、速度、成本正規化後依權重混合。</p>
+    <p>整套流程可重現:同樣的輸入必定得到同樣的名次。唯一的主觀判斷是契合度,而評分準則把它固定住了。頁面不儲存任何資料,重新整理即清空。</p>
+    <h3 style="margin-top:20px">證據來源</h3>
+    <p>「契合度優先」依據 Rees 等,<i>Perspect Med Educ</i> 2022(n=691):重視契合度使首投命中勝算比達 2.11,重視影響力則降至 0.37。時程預設值取自同一份調查。期望產出公式是 Salinas 與 Munch,<i>PLOS ONE</i> 2015 之馬可夫決策模型的簡化版。</p>
+    <p>標示 <span class="flag">未校準</span> 者為作者自訂、未經驗證的參數。完整出處與限制見 <code>docs/METHOD.md</code>。</p>
+  </footer>
+
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var fitFactors=[0.5,0.75,1.0,1.3,1.6];
+  var WK_PER_MONTH=4.345;
+
+  var GATES=[
+    ["主題契合","該刊近期確實刊登過你這個方向的東西。"],
+    ["收錄於你需要的資料庫","PubMed／MEDLINE、Scopus 或 Web of Science,看你的領域要求。"],
+    ["正當期刊、非掠奪型","列於 DOAJ 或通過 Think-Check-Submit;沒有假造的指標。"],
+    ["APC 在預算內","版面費或減免額度符合你手上的經費。"],
+    ["接受你的文章類型","原著／綜述／病例報告 —— 你真正寫出來的那一種。"]
+  ];
+
+  var DEFAULTS=[
+    {name:"頂尖刊(衝刺型)", if_:25, rate:8,  fit:3, wk:9, apc:5200},
+    {name:"專科強刊",       if_:8,  rate:20, fit:4, wk:7, apc:3000},
+    {name:"領域主力刊",     if_:4,  rate:35, fit:4, wk:5, apc:2400},
+    {name:"快速穩妥型",     if_:2.4,rate:55, fit:5, wk:4, apc:1800}
+  ];
+
+  var WEIGHT_DEFS=[
+    ["if","聲望(IF)",35],
+    ["acc","接受機率",30],
+    ["speed","速度",20],
+    ["cost","低成本",15]
+  ];
+
+  // 時長參照 Rees 等 2022(n=691):首次決議平均 8.4 週、
+  // 投稿到接受 19.6 週、第二本期刊首次決議 6.7 週。
+  var GANTT=[
+    ["排版與投前準備",2,"#3a4d70"],
+    ["投稿與行政檢核",1,"#3a4d70"],
+    ["編輯／初審決定",2,"#5a4d7a"],
+    ["同儕審查",5,"#223049"],
+    ["決議與修改",6,"#9a6a2e"],
+    ["二次審查",5,"#5a4d7a"],
+    ["接受→出版製作",3,"#0e7a64"]
+  ];
+
+  var rows=DEFAULTS.map(function(d){return Object.assign({},d);});
+  var weights={};WEIGHT_DEFS.forEach(function(w){weights[w[0]]=w[2];});
+  var mode="eim";
+  var ganttWeeks=GANTT.map(function(g){return g[1];});
+
+  var gateList=document.getElementById("gateList");
+  GATES.forEach(function(g){
+    var li=document.createElement("li");
+    li.innerHTML='<input type="checkbox" checked aria-label="'+g[0]+'"><span class="gate-txt"><strong>'+g[0]+'</strong><span>'+g[1]+'</span></span>';
+    gateList.appendChild(li);
+    li.addEventListener("click",function(e){
+      if(e.target.tagName!=="INPUT"){var c=li.querySelector("input");c.checked=!c.checked;}
+      render();
+    });
+  });
+  function gatesPass(){return Array.prototype.every.call(gateList.querySelectorAll("input"),function(c){return c.checked;});}
+  function gatesFailed(){return Array.prototype.filter.call(gateList.querySelectorAll("input"),function(c){return !c.checked;}).length;}
+
+  var tbody=document.getElementById("tbody");
+  function pAccept(r){
+    var f=fitFactors[Math.min(4,Math.max(0,Math.round(r.fit)-1))];
+    return Math.min(0.95,Math.max(0.02,(r.rate/100)*f));
+  }
+  function eim(r){
+    var months=Math.max(0.25,r.wk/WK_PER_MONTH);
+    return pAccept(r)*r.if_/months;
+  }
+  function balanced(r,ctx){
+    var pn=ctx.maxP?pAccept(r)/ctx.maxP:0;
+    var ifn=ctx.maxIF?r.if_/ctx.maxIF:0;
+    var sp=r.wk>0?ctx.minWk/r.wk:1;
+    var co=r.apc>0?(ctx.minApc>0?ctx.minApc/r.apc:1):1;
+    var tot=weights.if+weights.acc+weights.speed+weights.cost||1;
+    return 100*((weights.if/tot)*ifn+(weights.acc/tot)*pn+(weights.speed/tot)*sp+(weights.cost/tot)*co);
+  }
+  function score(r,ctx){return mode==="eim"?eim(r):balanced(r,ctx);}
+
+  function renderTable(ctx){
+    tbody.innerHTML="";
+    rows.forEach(function(r,i){
+      var tr=document.createElement("tr");
+      tr.innerHTML=
+        '<td><input class="jname" value="'+esc(r.name)+'" data-i="'+i+'" data-k="name"></td>'+
+        cellHTML(i,"if_",r.if_)+cellHTML(i,"rate",r.rate)+cellHTML(i,"fit",r.fit,"fit")+
+        cellHTML(i,"wk",r.wk)+cellHTML(i,"apc",r.apc)+
+        '<td class="out">'+(pAccept(r)*100).toFixed(0)+'%</td>'+
+        '<td class="out big">'+score(r,ctx).toFixed(mode==="eim"?1:0)+'</td>'+
+        '<td><button class="rm" data-rm="'+i+'" title="移除" aria-label="移除">×</button></td>';
+      tbody.appendChild(tr);
+    });
+    tbody.querySelectorAll("input").forEach(function(inp){
+      inp.addEventListener("input",function(){
+        var i=+inp.dataset.i,k=inp.dataset.k;
+        rows[i][k]=k==="name"?inp.value:(parseFloat(inp.value)||0);
+        render();
+      });
+    });
+    tbody.querySelectorAll("[data-rm]").forEach(function(b){
+      b.addEventListener("click",function(){rows.splice(+b.dataset.rm,1);render();});
+    });
+  }
+  function cellHTML(i,k,v,cls){
+    return '<td><input class="cell '+(cls||"")+'" type="number" step="any" value="'+v+'" data-i="'+i+'" data-k="'+k+'"></td>';
+  }
+
+  var verdictList=document.getElementById("verdictList");
+  function renderVerdict(ctx){
+    verdictList.innerHTML="";
+    if(!gatesPass()){
+      verdictList.innerHTML='<div class="no-verdict">還有 '+gatesFailed()+' 項門檻未通過 —— 先讓所有硬性門檻過關,才有排序可談。</div>';
+      return;
+    }
+    if(!rows.length){verdictList.innerHTML='<div class="no-verdict">請至少加入一本候選期刊。</div>';return;}
+    var ranked=rows.map(function(r){return {r:r,s:score(r,ctx)};}).sort(function(a,b){return b.s-a.s;});
+    var max=ranked[0].s||1;
+    ranked.forEach(function(o,idx){
+      var r=o.r,top=idx===0;
+      var pct=max>0?Math.max(3,(o.s/max)*100):0;
+      var div=document.createElement("div");
+      div.className="vrow"+(top?" top":"");
+      div.innerHTML=
+        '<div class="vrank">'+String(idx+1).padStart(2,"0")+'</div>'+
+        '<div class="vmid"><div class="vname">'+esc(r.name||"—")+
+          (top?'<span class="stamp">→ 投這本</span>':'')+'</div>'+
+          '<div class="vbar-track"><div class="vbar" style="width:'+pct+'%"></div></div>'+
+          '<div class="vmeta">IF '+r.if_+'  ·  接受機率 '+(pAccept(r)*100).toFixed(0)+'%  ·  '+r.wk+' 週  ·  $'+fmt(r.apc)+'</div>'+
+        '</div>'+
+        '<div class="vscore">'+o.s.toFixed(mode==="eim"?2:0)+'<small>'+(mode==="eim"?"EIM":"分數")+'</small></div>';
+      verdictList.appendChild(div);
+    });
+  }
+
+  var weightsEl=document.getElementById("weights");
+  WEIGHT_DEFS.forEach(function(w){
+    var div=document.createElement("div");div.className="wrow";
+    div.innerHTML='<label for="w_'+w[0]+'">'+w[1]+' <b id="wv_'+w[0]+'">'+w[2]+'</b></label>'+
+      '<input type="range" id="w_'+w[0]+'" min="0" max="100" value="'+w[2]+'">';
+    weightsEl.appendChild(div);
+    div.querySelector("input").addEventListener("input",function(e){
+      weights[w[0]]=+e.target.value;document.getElementById("wv_"+w[0]).textContent=e.target.value;
+      if(mode==="bal")render();
+    });
+  });
+
+  var FLOW=[
+    ["01","撰稿中","稿件與報告規範檢核表完成。",""],
+    ["02","排版","依選定期刊的規定調整格式。",""],
+    ["03","已投稿","系統送出,附上投稿信。",""],
+    ["04","編輯處理","行政檢核與退稿篩選。",""],
+    ["05","審查中","已送出外審。",""],
+    ["06","決議","拒稿／大修／小修／接受。","decision"],
+    ["07","修改中","回覆信與逐點修訂。",""],
+    ["08","已接受","校樣 → 製作 → 正式刊出。","accept"]
+  ];
+  (function(){
+    var el=document.getElementById("flowSteps");
+    FLOW.forEach(function(s){
+      var d=document.createElement("div");d.className="fstep"+(s[3]?" "+s[3]:"");
+      d.innerHTML='<div class="fn">'+s[0]+'</div><div class="fl">'+s[1]+'</div><div class="fd">'+s[2]+'</div>';
+      el.appendChild(d);
+    });
+  })();
+
+  var ganttGrid=document.getElementById("ganttGrid");
+  var ganttTicks=document.getElementById("ganttTicks");
+  var ganttTotalEl=document.getElementById("ganttTotal");
+  function renderGantt(){
+    var cascade=document.getElementById("cascade").checked;
+    var phases=GANTT.map(function(g,i){return {name:g[0],w:ganttWeeks[i],c:g[2]};});
+    if(cascade){
+      phases=[
+        {name:"排版與投前準備",w:ganttWeeks[0],c:"#3a4d70"},
+        {name:"投稿與檢核(第一刊)",w:ganttWeeks[1],c:"#3a4d70"},
+        {name:"編輯／初審(第一刊)",w:ganttWeeks[2],c:"#5a4d7a"},
+        {name:"同儕審查(第一刊)",w:ganttWeeks[3],c:"#223049"},
+        {name:"被拒 —— 重新排版",w:2,c:"#a03434"},
+        {name:"投稿與審查(第二刊)",w:7,c:"#223049"},
+        {name:"決議與修改",w:ganttWeeks[4],c:"#9a6a2e"},
+        {name:"二次審查",w:ganttWeeks[5],c:"#5a4d7a"},
+        {name:"接受→出版製作",w:ganttWeeks[6],c:"#0e7a64"}
+      ];
+    }
+    var total=phases.reduce(function(a,p){return a+p.w;},0)||1;
+    ganttTotalEl.textContent=total;
+    ganttGrid.innerHTML="";
+    var cum=0;
+    phases.forEach(function(p,i){
+      var editable=!cascade;
+      var lab=document.createElement("div");lab.className="glabel";
+      lab.innerHTML=esc(p.name)+(editable
+        ?' <input type="number" min="0" step="1" value="'+p.w+'" data-g="'+i+'" aria-label="週數">'
+        :' <span style="font-family:var(--mono);font-size:11px;color:var(--muted)">'+p.w+'週</span>');
+      ganttGrid.appendChild(lab);
+      var track=document.createElement("div");track.className="gtrack";
+      var bar=document.createElement("div");bar.className="gbar";
+      bar.style.left=(cum/total*100)+"%";
+      bar.style.width=Math.max(2,p.w/total*100)+"%";
+      bar.style.background=p.c;
+      bar.textContent=p.w+"週";
+      track.appendChild(bar);ganttGrid.appendChild(track);
+      cum+=p.w;
+    });
+    if(!cascade){
+      ganttGrid.querySelectorAll("[data-g]").forEach(function(inp){
+        inp.addEventListener("input",function(){ganttWeeks[+inp.dataset.g]=parseFloat(inp.value)||0;renderGantt();});
+      });
+    }
+    ganttTicks.innerHTML="";
+    var steps=4;
+    for(var t=0;t<=steps;t++){
+      var s=document.createElement("span");s.className="gtick";
+      s.style.left=(t/steps*100)+"%";s.textContent=Math.round(total*t/steps)+"週";
+      ganttTicks.appendChild(s);
+    }
+  }
+  document.getElementById("cascade").addEventListener("change",renderGantt);
+
+  document.getElementById("addRow").addEventListener("click",function(){
+    rows.push({name:"新期刊",if_:5,rate:25,fit:3,wk:6,apc:2500});render();
+  });
+  document.getElementById("resetRows").addEventListener("click",function(){
+    rows=DEFAULTS.map(function(d){return Object.assign({},d);});render();
+  });
+  function setMode(m){
+    mode=m;
+    document.getElementById("modeEIM").classList.toggle("on",m==="eim");
+    document.getElementById("modeBal").classList.toggle("on",m==="bal");
+    render();
+  }
+  document.getElementById("modeEIM").addEventListener("click",function(){setMode("eim");});
+  document.getElementById("modeBal").addEventListener("click",function(){setMode("bal");});
+
+  function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});}
+  function fmt(n){return (Math.round(n)||0).toLocaleString();}
+  function context(){
+    var maxIF=0,maxP=0,minWk=Infinity,minApc=Infinity;
+    rows.forEach(function(r){
+      maxIF=Math.max(maxIF,r.if_);maxP=Math.max(maxP,pAccept(r));
+      if(r.wk>0)minWk=Math.min(minWk,r.wk);
+      if(r.apc>0)minApc=Math.min(minApc,r.apc);
+    });
+    if(minWk===Infinity)minWk=1;if(minApc===Infinity)minApc=0;
+    return {maxIF:maxIF,maxP:maxP,minWk:minWk,minApc:minApc};
+  }
+  function render(){var ctx=context();renderTable(ctx);renderVerdict(ctx);}
+  render();renderGantt();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,117 @@
+# ---------------------------------------------------------------------------
+# Submission Desk — .gitignore
+#
+# This is a dependency-free static site. Most of what follows is defensive:
+# it keeps OS clutter, editor state, and any future tooling out of the tree.
+# Deliberately NOT ignored: package-lock.json / pnpm-lock.yaml (lockfiles
+# belong in version control) and docs/ build inputs.
+# ---------------------------------------------------------------------------
+
+# --- Operating system ------------------------------------------------------
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+.AppleDouble
+.LSOverride
+Icon?
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+desktop.ini
+$RECYCLE.BIN/
+*.lnk
+
+# --- Editors and IDEs ------------------------------------------------------
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json.example
+.idea/
+*.iml
+*.sublime-project
+*.sublime-workspace
+.project
+.settings/
+*.swp
+*.swo
+*.swn
+*~
+\#*\#
+.\#*
+.netrwhist
+nbproject/
+
+# --- Node / front-end tooling ----------------------------------------------
+node_modules/
+jspm_packages/
+.npm/
+.yarn/*
+!.yarn/patches
+!.yarn/releases
+!.yarn/plugins
+!.yarn/sdks
+!.yarn/versions
+.pnp.*
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+.eslintcache
+.stylelintcache
+.parcel-cache/
+.turbo/
+
+# --- Build output ----------------------------------------------------------
+dist/
+build/
+out/
+.cache/
+.tmp/
+tmp/
+_site/
+.vitepress/dist/
+
+# --- Python (for any future data-prep or calibration scripts) --------------
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.eggs/
+.venv/
+venv/
+env/
+ENV/
+.python-version
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.ipynb_checkpoints/
+
+# --- Environment and secrets -----------------------------------------------
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+secrets.*
+credentials.json
+
+# --- Logs, reports, coverage -----------------------------------------------
+*.log
+logs/
+coverage/
+*.lcov
+.nyc_output/
+lighthouse-report.*
+
+# --- Local scratch ---------------------------------------------------------
+# Working notes, exported CSVs of your own submission history, etc.
+# Keep your real journal data out of a public repo.
+scratch/
+private/
+*.local.*
+*.bak
+*.orig
+*.rej

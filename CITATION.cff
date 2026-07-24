@@ -1,0 +1,75 @@
+cff-version: 1.2.0
+title: "Submission Desk: a deterministic journal-selection tool for manuscript submission"
+message: >-
+  If you use this tool, please cite it as below. For any claim about the
+  underlying method, please cite the primary research listed in `references`.
+type: software
+authors:
+  - name: "Submission Desk contributors"
+repository-code: "https://github.com/YOUR-USERNAME/submission-desk"
+abstract: >-
+  A dependency-free, single-file web tool that turns journal selection into a
+  reproducible procedure: binary eligibility gates, an explicit scoring model
+  combining impact factor, acceptance rate, manuscript-journal fit, time to
+  first decision and article processing charge, a fixed submission status flow,
+  and an editable timeline. Ships in English and Traditional Chinese.
+keywords:
+  - scholarly publishing
+  - journal selection
+  - peer review
+  - decision support
+  - research workflow
+license: MIT
+version: 0.1.0
+date-released: "2026-07-24"
+references:
+  - type: article
+    title: >-
+      A method for the madness: an international survey of health professions
+      education authors' journal choice
+    authors:
+      - family-names: Rees
+        given-names: Eliot L.
+      - family-names: Burton
+        given-names: Oliver
+      - family-names: Asif
+        given-names: Aqua
+      - family-names: Eva
+        given-names: Kevin W.
+    journal: "Perspectives on Medical Education"
+    year: 2022
+    volume: 11
+    issue: 3
+    start: 165
+    end: 172
+    doi: 10.1007/s40037-022-00698-9
+  - type: article
+    title: "Where should I send it? Optimizing the submission decision process"
+    authors:
+      - family-names: Salinas
+        given-names: Santiago
+      - family-names: Munch
+        given-names: Stephan B.
+    journal: "PLOS ONE"
+    year: 2015
+    volume: 10
+    issue: 1
+    doi: 10.1371/journal.pone.0115451
+  - type: article
+    title: >-
+      A review of journal impact metrics and characteristics to assist emergency
+      medicine investigators with manuscript submission decisions
+    authors:
+      - family-names: Rodriguez
+        given-names: Robert M.
+      - family-names: Chan
+        given-names: Virginia
+      - family-names: Wong
+        given-names: Angela H. K.
+      - family-names: Montoy
+        given-names: Juan Carlos C.
+    journal: "Western Journal of Emergency Medicine"
+    year: 2020
+    volume: 21
+    issue: 4
+    doi: 10.5811/westjem.2020.4.47030

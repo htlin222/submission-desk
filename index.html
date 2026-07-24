@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Submission Desk — Deterministic Journal Decision Engine</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;450;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#171a21;
+    --canvas:#e6e7e1;
+    --panel:#fcfcfa;
+    --panel-2:#f2f3ee;
+    --line:#d2d4cb;
+    --line-soft:#e2e3dc;
+    --slate:#223049;
+    --slate-2:#3a4d70;
+    --verdict:#0e7a64;
+    --verdict-soft:#0e7a6414;
+    --caution:#9a6a2e;
+    --caution-soft:#9a6a2e14;
+    --reject:#a03434;
+    --muted:#6a7180;
+    --mono:'IBM Plex Mono',ui-monospace,monospace;
+    --disp:'Space Grotesk',system-ui,sans-serif;
+    --body:'Inter',system-ui,sans-serif;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0;background:var(--canvas);color:var(--ink);
+    font-family:var(--body);font-size:15px;line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:1080px;margin:0 auto;padding:0 20px 80px}
+
+  /* ---------- header ---------- */
+  .topbar{display:flex;justify-content:space-between;align-items:flex-start;gap:16px}
+  .langnav{font-family:var(--mono);font-size:11px;display:flex;gap:10px;align-items:center;flex:none}
+  .langnav span{color:var(--ink);font-weight:600;border-bottom:1.5px solid var(--verdict);padding-bottom:2px}
+  .langnav a{color:var(--muted);text-decoration:none;padding-bottom:2px;border-bottom:1.5px solid transparent}
+  .langnav a:hover{color:var(--ink);border-bottom-color:var(--line)}
+  .flag{font-family:var(--mono);font-size:9px;letter-spacing:.08em;text-transform:uppercase;
+    color:var(--caution);background:var(--caution-soft);border:1px solid var(--caution);
+    padding:1px 5px;border-radius:3px;vertical-align:middle;white-space:nowrap;font-weight:600}
+  header.masthead{
+    border-bottom:2px solid var(--ink);
+    padding:34px 0 22px;margin-bottom:8px;
+  }
+  .kicker{
+    font-family:var(--mono);font-size:11px;letter-spacing:.22em;
+    text-transform:uppercase;color:var(--slate-2);margin:0 0 12px;
+  }
+  h1{
+    font-family:var(--disp);font-weight:600;font-size:clamp(30px,5vw,46px);
+    line-height:1.02;letter-spacing:-.02em;margin:0 0 14px;
+  }
+  h1 em{font-style:normal;color:var(--verdict)}
+  .thesis{max-width:640px;color:#39414f;font-size:15.5px;margin:0}
+  .thesis code{
+    font-family:var(--mono);font-size:13px;background:var(--slate);
+    color:#eef1ee;padding:1px 6px;border-radius:3px;
+  }
+
+  /* ---------- section scaffolding ---------- */
+  section{margin-top:38px}
+  .shead{display:flex;align-items:baseline;gap:14px;margin-bottom:16px}
+  .snum{
+    font-family:var(--mono);font-size:12px;font-weight:600;color:var(--panel);
+    background:var(--slate);width:26px;height:26px;flex:none;
+    display:grid;place-items:center;border-radius:4px;margin-top:2px;
+  }
+  .shead h2{
+    font-family:var(--disp);font-weight:600;font-size:20px;letter-spacing:-.01em;margin:0;
+  }
+  .shead p{margin:2px 0 0;color:var(--muted);font-size:13.5px}
+  .panel{
+    background:var(--panel);border:1px solid var(--line);border-radius:10px;
+    padding:20px;
+  }
+
+  /* ---------- gates ---------- */
+  .gates{list-style:none;margin:0;padding:0;display:grid;gap:2px}
+  .gates li{
+    display:flex;align-items:flex-start;gap:12px;padding:11px 12px;border-radius:7px;
+    cursor:pointer;transition:background .12s;
+  }
+  .gates li:hover{background:var(--panel-2)}
+  .gates input{
+    appearance:none;-webkit-appearance:none;width:20px;height:20px;flex:none;margin-top:1px;
+    border:1.6px solid var(--caution);border-radius:5px;background:var(--panel);
+    cursor:pointer;position:relative;transition:.12s;
+  }
+  .gates input:checked{background:var(--verdict);border-color:var(--verdict)}
+  .gates input:checked::after{
+    content:"";position:absolute;left:6px;top:2px;width:5px;height:10px;
+    border:solid var(--panel);border-width:0 2.2px 2.2px 0;transform:rotate(45deg);
+  }
+  .gates input:focus-visible{outline:2px solid var(--slate-2);outline-offset:2px}
+  .gate-txt strong{font-weight:600;display:block;font-size:14.5px}
+  .gate-txt span{color:var(--muted);font-size:12.5px}
+  .gate-count{
+    font-family:var(--mono);font-size:12px;color:var(--caution);
+    margin-left:auto;align-self:center;white-space:nowrap;
+  }
+
+  /* ---------- table ---------- */
+  .tbl-scroll{overflow-x:auto;border:1px solid var(--line);border-radius:10px;background:var(--panel)}
+  table{border-collapse:collapse;width:100%;min-width:720px}
+  thead th{
+    font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;
+    color:var(--slate-2);text-align:left;padding:12px 10px;font-weight:600;
+    border-bottom:1.5px solid var(--line);white-space:nowrap;background:var(--panel-2);
+  }
+  thead th abbr{text-decoration:none;border-bottom:1px dotted var(--muted);cursor:help}
+  tbody td{padding:6px 8px;border-bottom:1px solid var(--line-soft);vertical-align:middle}
+  tbody tr:last-child td{border-bottom:none}
+  .jname{
+    font-family:var(--body);font-weight:500;font-size:14px;width:100%;border:none;background:transparent;
+    padding:6px 6px;border-radius:5px;color:var(--ink);
+  }
+  .jname:focus{background:var(--panel-2);outline:1px solid var(--slate-2)}
+  .cell{
+    font-family:var(--mono);font-size:13px;width:66px;text-align:right;
+    border:1px solid transparent;background:var(--panel-2);border-radius:5px;padding:6px 7px;color:var(--ink);
+  }
+  .cell:focus{outline:none;border-color:var(--slate-2);background:var(--panel)}
+  .cell.fit{width:52px}
+  .out{font-family:var(--mono);font-size:13px;font-weight:500;text-align:right;color:var(--slate)}
+  .out.big{font-weight:600}
+  .rm{
+    border:none;background:transparent;color:var(--muted);cursor:pointer;font-size:17px;
+    line-height:1;padding:4px 6px;border-radius:5px;
+  }
+  .rm:hover{background:#f0d9d9;color:var(--reject)}
+  .tbl-actions{display:flex;gap:10px;align-items:center;margin-top:14px;flex-wrap:wrap}
+  .btn{
+    font-family:var(--body);font-weight:500;font-size:13.5px;border-radius:7px;cursor:pointer;
+    padding:8px 14px;border:1px solid var(--slate);background:var(--slate);color:var(--panel);
+    transition:.12s;
+  }
+  .btn:hover{background:var(--slate-2);border-color:var(--slate-2)}
+  .btn.ghost{background:transparent;color:var(--slate);border-color:var(--line)}
+  .btn.ghost:hover{background:var(--panel-2)}
+  .btn:focus-visible{outline:2px solid var(--slate-2);outline-offset:2px}
+
+  /* ---------- weights ---------- */
+  .weights{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:16px 22px;margin-top:6px}
+  .wrow label{display:flex;justify-content:space-between;font-size:12.5px;color:var(--slate-2);margin-bottom:5px;font-weight:500}
+  .wrow label b{font-family:var(--mono);font-weight:600;color:var(--ink)}
+  input[type=range]{width:100%;accent-color:var(--slate);cursor:pointer}
+  .mode-toggle{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:var(--panel-2)}
+  .mode-toggle button{
+    font-family:var(--mono);font-size:11.5px;letter-spacing:.03em;border:none;background:transparent;
+    padding:8px 14px;cursor:pointer;color:var(--muted);font-weight:600;
+  }
+  .mode-toggle button.on{background:var(--slate);color:var(--panel)}
+
+  /* ---------- verdict ---------- */
+  .verdict-list{display:grid;gap:10px}
+  .vrow{
+    display:grid;grid-template-columns:22px 1fr auto;align-items:center;gap:14px;
+    padding:14px 16px;border:1px solid var(--line);border-radius:9px;background:var(--panel);
+    position:relative;overflow:hidden;
+  }
+  .vrow.top{border-color:var(--verdict);border-width:1.5px;background:var(--verdict-soft)}
+  .vrank{font-family:var(--mono);font-size:13px;font-weight:600;color:var(--muted)}
+  .vrow.top .vrank{color:var(--verdict)}
+  .vmid{min-width:0}
+  .vname{font-weight:600;font-size:15px;display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+  .stamp{
+    font-family:var(--mono);font-size:9.5px;letter-spacing:.14em;color:var(--panel);
+    background:var(--verdict);padding:3px 8px;border-radius:3px;font-weight:600;
+  }
+  .vbar-track{height:7px;background:var(--panel-2);border-radius:4px;margin-top:9px;overflow:hidden}
+  .vbar{height:100%;background:var(--slate-2);border-radius:4px;transition:width .35s ease}
+  .vrow.top .vbar{background:var(--verdict)}
+  .vmeta{font-family:var(--mono);font-size:11px;color:var(--muted);margin-top:7px}
+  .vscore{font-family:var(--mono);font-weight:600;font-size:20px;text-align:right;color:var(--slate);white-space:nowrap}
+  .vrow.top .vscore{color:var(--verdict)}
+  .vscore small{display:block;font-size:9.5px;font-weight:500;letter-spacing:.08em;color:var(--muted);text-transform:uppercase}
+  .no-verdict{color:var(--muted);font-style:italic;padding:8px 2px}
+
+  /* ---------- flow ---------- */
+  .flow{display:flex;flex-wrap:wrap;gap:8px;align-items:stretch}
+  .fstep{
+    flex:1 1 120px;min-width:110px;border:1px solid var(--line);border-radius:8px;background:var(--panel);
+    padding:11px 12px;position:relative;
+  }
+  .fstep .fn{font-family:var(--mono);font-size:10px;color:var(--muted)}
+  .fstep .fl{font-weight:600;font-size:13px;margin-top:2px}
+  .fstep .fd{font-size:11.5px;color:var(--muted);margin-top:3px;line-height:1.35}
+  .fstep.decision{border-color:var(--caution);background:var(--caution-soft)}
+  .fstep.accept{border-color:var(--verdict);background:var(--verdict-soft)}
+  .branch{
+    display:flex;gap:8px;align-items:center;font-family:var(--mono);font-size:11.5px;
+    color:var(--reject);margin-top:14px;padding:10px 14px;border:1px dashed var(--reject);
+    border-radius:8px;background:#fbf3f3;
+  }
+  .branch b{color:var(--reject)}
+
+  /* ---------- gantt ---------- */
+  .gantt-head{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:14px}
+  .gtotal{font-family:var(--mono);font-size:13px;color:var(--slate)}
+  .gtotal b{font-size:16px;color:var(--verdict)}
+  .grid{display:grid;grid-template-columns:150px 1fr;gap:0 12px;align-items:center}
+  .glabel{font-size:12.5px;font-weight:500;padding:7px 0;display:flex;align-items:center;gap:8px}
+  .glabel input{
+    width:42px;font-family:var(--mono);font-size:12px;text-align:right;border:1px solid var(--line);
+    background:var(--panel);border-radius:4px;padding:3px 5px;color:var(--ink);
+  }
+  .glabel input:focus{outline:none;border-color:var(--slate-2)}
+  .gtrack{position:relative;height:26px;background:var(--panel-2);border-radius:4px;overflow:hidden}
+  .gbar{position:absolute;top:3px;height:20px;border-radius:3px;display:flex;align-items:center;
+    padding:0 8px;font-family:var(--mono);font-size:10.5px;color:var(--panel);white-space:nowrap;
+    transition:left .3s ease,width .3s ease;}
+  .gaxis{display:grid;grid-template-columns:150px 1fr;gap:0 12px;margin-top:6px}
+  .gaxis .ticks{position:relative;height:16px;font-family:var(--mono);font-size:10px;color:var(--muted)}
+  .gtick{position:absolute;transform:translateX(-50%);top:0}
+  .cascade-row{display:flex;align-items:center;gap:9px;margin-top:16px;font-size:13px}
+  .cascade-row input{width:18px;height:18px;accent-color:var(--slate)}
+
+  footer{margin-top:46px;border-top:1px solid var(--line);padding-top:22px;color:var(--muted);font-size:12.5px}
+  footer h3{font-family:var(--disp);font-size:14px;color:var(--slate);margin:0 0 8px}
+  footer p{margin:0 0 8px;max-width:760px}
+  footer code{font-family:var(--mono);font-size:11.5px;color:var(--slate)}
+
+  @media (max-width:620px){
+    .grid,.gaxis{grid-template-columns:96px 1fr}
+    .glabel{font-size:11.5px}
+    .vrow{grid-template-columns:20px 1fr;grid-template-rows:auto auto}
+    .vscore{grid-column:2;text-align:left;margin-top:8px}
+  }
+  @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="masthead">
+    <div class="topbar"><p class="kicker">Submission Desk · deterministic method</p><nav class="langnav"><span aria-current="true">EN</span><a href="zh-TW/">繁中</a></nav></div>
+    <h1>Where do I send<br>this <em>manuscript?</em></h1>
+    <p class="thesis">Gate, score, rank — repeatably. The verdict is driven by <code>EIM = (P_accept × IF) / months</code>, so prestige you can't realistically capture in reasonable time stops flattering the long shot.</p>
+  </header>
+
+  <!-- 1 GATES -->
+  <section id="gates">
+    <div class="shead">
+      <span class="snum">1</span>
+      <div><h2>Hard gates</h2><p>A journal must clear every box to be scored. Uncheck one → it's out, no debate.</p></div>
+    </div>
+    <div class="panel">
+      <ul class="gates" id="gateList"></ul>
+    </div>
+  </section>
+
+  <!-- 2 CANDIDATES -->
+  <section id="candidates">
+    <div class="shead">
+      <span class="snum">2</span>
+      <div><h2>Candidate journals</h2><p>Edit any cell. Fit is a 1–5 rubric score (scope-match × novelty × rigor vs the journal's bar).</p></div>
+    </div>
+    <div class="tbl-scroll">
+      <table>
+        <thead><tr>
+          <th style="width:100%">Journal</th>
+          <th><abbr title="Impact Factor (or field percentile) — raw prestige">IF</abbr></th>
+          <th><abbr title="Published acceptance rate, %">Rate&nbsp;%</abbr></th>
+          <th><abbr title="Your fit, 1–5. Modifies acceptance odds: 1×0.5 … 3×1.0 … 5×1.6. Multipliers are uncalibrated heuristics.">Fit</abbr> <span class="flag">heuristic</span></th>
+          <th><abbr title="Weeks to first decision">Wk</abbr></th>
+          <th><abbr title="Article processing charge">APC</abbr></th>
+          <th><abbr title="Modelled probability of acceptance">P&nbsp;acc</abbr></th>
+          <th><abbr title="Ranking score for the current mode">Score</abbr></th>
+          <th></th>
+        </tr></thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+    <div class="tbl-actions">
+      <button class="btn" id="addRow">+ Add journal</button>
+      <button class="btn ghost" id="resetRows">Reset examples</button>
+      <div class="mode-toggle" role="group" aria-label="Ranking mode" style="margin-left:auto">
+        <button id="modeEIM" class="on">EXPECTED&nbsp;YIELD</button>
+        <button id="modeBal">BALANCED</button>
+      </div>
+    </div>
+
+    <div class="panel" style="margin-top:16px">
+      <label style="font-size:12.5px;color:var(--slate-2);font-weight:600;display:block;margin-bottom:12px">Balanced-mode weights <span class="flag">heuristic defaults</span> <span style="color:var(--muted);font-weight:400">(auto-normalized; ignored in Expected Yield; scores are relative to this candidate set only)</span></label>
+      <div class="weights" id="weights"></div>
+    </div>
+  </section>
+
+  <!-- 3 VERDICT -->
+  <section id="verdict">
+    <div class="shead">
+      <span class="snum">3</span>
+      <div><h2>Verdict</h2><p>Ranked, deterministic. Top pick gets the stamp. Bars are relative to the leader.</p></div>
+    </div>
+    <div class="verdict-list" id="verdictList"></div>
+  </section>
+
+  <!-- 4 FLOW -->
+  <section id="flow">
+    <div class="shead">
+      <span class="snum">4</span>
+      <div><h2>Flow &amp; status</h2><p>Fixed states so tracking never drifts. Reject loops back to the next journal on the ladder.</p></div>
+    </div>
+    <div class="panel">
+      <div class="flow" id="flowSteps"></div>
+      <div class="branch">↩&nbsp; On <b>Reject</b>: return to <b>Format</b> for journal #2 on your ranked ladder — no re-deciding, the list already picked it.</div>
+    </div>
+  </section>
+
+  <!-- 5 GANTT -->
+  <section id="gantt">
+    <div class="shead">
+      <span class="snum">5</span>
+      <div><h2>Timeline</h2><p>Typical durations — edit the weeks. This is what the "stretch" submission really costs you.</p></div>
+    </div>
+    <div class="panel">
+      <div class="gantt-head">
+        <div class="gtotal">Time to publication: <b id="ganttTotal">0</b> weeks</div>
+        <label class="cascade-row"><input type="checkbox" id="cascade"> add a rejection + resubmission cycle</label>
+      </div>
+      <div class="grid" id="ganttGrid"></div>
+      <div class="gaxis"><div></div><div class="ticks" id="ganttTicks"></div></div>
+    </div>
+  </section>
+
+  <footer>
+    <h3>How the numbers work</h3>
+    <p><code>P_accept = clamp( (Rate/100) × fitFactor , 0.02 , 0.95 )</code> with fitFactor = 0.5 / 0.75 / 1.0 / 1.3 / 1.6 for Fit 1–5.</p>
+    <p><b>Expected Yield</b> ranks by <code>EIM = P_accept × IF / (weeks ÷ 4.345)</code> — impact actually captured per month. <b>Balanced</b> ranks by a weighted, min-max-normalized blend of prestige, acceptance odds, speed and cost.</p>
+    <p>Everything is repeatable: same inputs → same ranking. The only judgement is the Fit score, and the rubric pins that down. Nothing is stored — reloading clears the desk.</p>
+    <h3 style="margin-top:20px">Evidence</h3>
+    <p>Fit-first ranking follows Rees et al., <i>Perspect Med Educ</i> 2022 (n=691): prioritising fit doubled the odds of first-choice acceptance (OR 2.11), while prioritising impact reduced them (OR 0.37). Timeline defaults come from the same survey. The Expected Yield formula is a simplification of the Markov decision model in Salinas &amp; Munch, <i>PLOS ONE</i> 2015.</p>
+    <p>Items marked <span class="flag">heuristic</span> are author-set and unvalidated. Full provenance and limitations: <code>docs/METHOD.md</code>.</p>
+  </footer>
+
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var fitFactors=[0.5,0.75,1.0,1.3,1.6];
+  var WK_PER_MONTH=4.345;
+
+  var GATES=[
+    ["Scope match","Your topic appears in their recent published record."],
+    ["Indexed where you need it","MEDLINE / PubMed, Scopus or Web of Science, as your field requires."],
+    ["Legitimate, not predatory","In DOAJ / passes Think-Check-Submit; no fake metrics."],
+    ["APC within budget","Charge (or waiver) fits your funding."],
+    ["Accepts your article type","Original / review / case report — whatever you actually have."]
+  ];
+
+  var DEFAULTS=[
+    {name:"Top-tier (stretch)",  if_:25, rate:8,  fit:3, wk:9, apc:5200},
+    {name:"Strong specialty",    if_:8,  rate:20, fit:4, wk:7, apc:3000},
+    {name:"Solid field journal", if_:4,  rate:35, fit:4, wk:5, apc:2400},
+    {name:"Fast & safe",         if_:2.4,rate:55, fit:5, wk:4, apc:1800}
+  ];
+
+  var WEIGHT_DEFS=[
+    ["if","Prestige (IF)",35],
+    ["acc","Acceptance odds",30],
+    ["speed","Speed",20],
+    ["cost","Low cost",15]
+  ];
+
+  // Durations anchored to Rees et al. 2022 (n=691): mean 8.4 wk to first
+  // decision, 19.6 wk submission→acceptance, 6.7 wk at the second journal.
+  var GANTT=[
+    ["Format & prepare",2,"#3a4d70"],
+    ["Submit & admin check",1,"#3a4d70"],
+    ["Editor / desk decision",2,"#5a4d7a"],
+    ["Peer review",5,"#223049"],
+    ["Decision & revision",6,"#9a6a2e"],
+    ["Re-review",5,"#5a4d7a"],
+    ["Accept → production",3,"#0e7a64"]
+  ];
+
+  var rows=DEFAULTS.map(function(d){return Object.assign({},d);});
+  var weights={};WEIGHT_DEFS.forEach(function(w){weights[w[0]]=w[2];});
+  var mode="eim";
+  var ganttWeeks=GANTT.map(function(g){return g[1];});
+
+  // ---------- gates ----------
+  var gateList=document.getElementById("gateList");
+  GATES.forEach(function(g,i){
+    var li=document.createElement("li");
+    li.innerHTML='<input type="checkbox" checked aria-label="'+g[0]+'"><span class="gate-txt"><strong>'+g[0]+'</strong><span>'+g[1]+'</span></span>';
+    gateList.appendChild(li);
+    li.addEventListener("click",function(e){
+      if(e.target.tagName!=="INPUT"){var c=li.querySelector("input");c.checked=!c.checked;render();}
+      else render();
+    });
+  });
+  function gatesPass(){return Array.prototype.every.call(gateList.querySelectorAll("input"),function(c){return c.checked;});}
+  function gatesFailed(){return Array.prototype.filter.call(gateList.querySelectorAll("input"),function(c){return !c.checked;}).length;}
+
+  // ---------- table ----------
+  var tbody=document.getElementById("tbody");
+  function pAccept(r){
+    var f=fitFactors[Math.min(4,Math.max(0,Math.round(r.fit)-1))];
+    return Math.min(0.95,Math.max(0.02,(r.rate/100)*f));
+  }
+  function eim(r){
+    var months=Math.max(0.25,r.wk/WK_PER_MONTH);
+    return pAccept(r)*r.if_/months;
+  }
+  function balanced(r,ctx){
+    var pn=ctx.maxP?pAccept(r)/ctx.maxP:0;
+    var ifn=ctx.maxIF?r.if_/ctx.maxIF:0;
+    var sp=r.wk>0?ctx.minWk/r.wk:1;
+    var co=r.apc>0?(ctx.minApc>0?ctx.minApc/r.apc:1):1;
+    var tot=weights.if+weights.acc+weights.speed+weights.cost||1;
+    return 100*((weights.if/tot)*ifn+(weights.acc/tot)*pn+(weights.speed/tot)*sp+(weights.cost/tot)*co);
+  }
+  function score(r,ctx){return mode==="eim"?eim(r):balanced(r,ctx);}
+
+  function renderTable(ctx){
+    tbody.innerHTML="";
+    rows.forEach(function(r,i){
+      var tr=document.createElement("tr");
+      tr.innerHTML=
+        '<td><input class="jname" value="'+esc(r.name)+'" data-i="'+i+'" data-k="name"></td>'+
+        cellHTML(i,"if_",r.if_)+cellHTML(i,"rate",r.rate)+cellHTML(i,"fit",r.fit,"fit")+
+        cellHTML(i,"wk",r.wk)+cellHTML(i,"apc",r.apc)+
+        '<td class="out">'+(pAccept(r)*100).toFixed(0)+'%</td>'+
+        '<td class="out big">'+score(r,ctx).toFixed(mode==="eim"?1:0)+'</td>'+
+        '<td><button class="rm" data-rm="'+i+'" title="Remove" aria-label="Remove '+esc(r.name)+'">×</button></td>';
+      tbody.appendChild(tr);
+    });
+    tbody.querySelectorAll("input").forEach(function(inp){
+      inp.addEventListener("input",function(){
+        var i=+inp.dataset.i,k=inp.dataset.k;
+        rows[i][k]=k==="name"?inp.value:(parseFloat(inp.value)||0);
+        render();
+      });
+    });
+    tbody.querySelectorAll("[data-rm]").forEach(function(b){
+      b.addEventListener("click",function(){rows.splice(+b.dataset.rm,1);render();});
+    });
+  }
+  function cellHTML(i,k,v,cls){
+    return '<td><input class="cell '+(cls||"")+'" type="number" step="any" value="'+v+'" data-i="'+i+'" data-k="'+k+'"></td>';
+  }
+
+  // ---------- verdict ----------
+  var verdictList=document.getElementById("verdictList");
+  function renderVerdict(ctx){
+    verdictList.innerHTML="";
+    if(!gatesPass()){
+      verdictList.innerHTML='<div class="no-verdict">'+gatesFailed()+' gate(s) unchecked — clear all hard gates before ranking a shortlist.</div>';
+      return;
+    }
+    if(!rows.length){verdictList.innerHTML='<div class="no-verdict">Add at least one candidate journal.</div>';return;}
+    var ranked=rows.map(function(r){return {r:r,s:score(r,ctx)};})
+      .sort(function(a,b){return b.s-a.s;});
+    var max=ranked[0].s||1;
+    ranked.forEach(function(o,idx){
+      var r=o.r,top=idx===0;
+      var pct=max>0?Math.max(3,(o.s/max)*100):0;
+      var div=document.createElement("div");
+      div.className="vrow"+(top?" top":"");
+      div.innerHTML=
+        '<div class="vrank">'+String(idx+1).padStart(2,"0")+'</div>'+
+        '<div class="vmid"><div class="vname">'+esc(r.name||"—")+
+          (top?'<span class="stamp">→ SUBMIT HERE</span>':'')+'</div>'+
+          '<div class="vbar-track"><div class="vbar" style="width:'+pct+'%"></div></div>'+
+          '<div class="vmeta">IF '+r.if_+'  ·  P '+(pAccept(r)*100).toFixed(0)+'%  ·  '+r.wk+' wk  ·  $'+fmt(r.apc)+'</div>'+
+        '</div>'+
+        '<div class="vscore">'+o.s.toFixed(mode==="eim"?2:0)+'<small>'+(mode==="eim"?"EIM":"score")+'</small></div>';
+      verdictList.appendChild(div);
+    });
+  }
+
+  // ---------- weights ----------
+  var weightsEl=document.getElementById("weights");
+  WEIGHT_DEFS.forEach(function(w){
+    var div=document.createElement("div");div.className="wrow";
+    div.innerHTML='<label for="w_'+w[0]+'">'+w[1]+' <b id="wv_'+w[0]+'">'+w[2]+'</b></label>'+
+      '<input type="range" id="w_'+w[0]+'" min="0" max="100" value="'+w[2]+'">';
+    weightsEl.appendChild(div);
+    div.querySelector("input").addEventListener("input",function(e){
+      weights[w[0]]=+e.target.value;document.getElementById("wv_"+w[0]).textContent=e.target.value;
+      if(mode==="bal")render();
+    });
+  });
+
+  // ---------- flow ----------
+  var FLOW=[
+    ["01","Drafting","Manuscript + reporting checklist done.",""],
+    ["02","Format","Tailor to the picked journal's rules.",""],
+    ["03","Submitted","In the system; cover letter sent.",""],
+    ["04","With editor","Admin + desk-reject screen.",""],
+    ["05","Under review","Out to reviewers.",""],
+    ["06","Decision","Reject / Major / Minor / Accept.","decision"],
+    ["07","Revision","Response letter + edits.",""],
+    ["08","Accepted","Proofs → production → published.","accept"]
+  ];
+  (function(){
+    var el=document.getElementById("flowSteps");
+    FLOW.forEach(function(s){
+      var d=document.createElement("div");d.className="fstep"+(s[3]?" "+s[3]:"");
+      d.innerHTML='<div class="fn">'+s[0]+'</div><div class="fl">'+s[1]+'</div><div class="fd">'+s[2]+'</div>';
+      el.appendChild(d);
+    });
+  })();
+
+  // ---------- gantt ----------
+  var ganttGrid=document.getElementById("ganttGrid");
+  var ganttTicks=document.getElementById("ganttTicks");
+  var ganttTotalEl=document.getElementById("ganttTotal");
+  function renderGantt(){
+    var cascade=document.getElementById("cascade").checked;
+    var phases=GANTT.map(function(g,i){return {name:g[0],w:ganttWeeks[i],c:g[2]};});
+    if(cascade){
+      // insert a rejection after review, then a fresh short cycle for journal #2
+      phases=[
+        {name:"Format & prepare",w:ganttWeeks[0],c:"#3a4d70"},
+        {name:"Submit & admin (J1)",w:ganttWeeks[1],c:"#3a4d70"},
+        {name:"Editor / desk (J1)",w:ganttWeeks[2],c:"#5a4d7a"},
+        {name:"Peer review (J1)",w:ganttWeeks[3],c:"#223049"},
+        {name:"Rejected — reformat",w:2,c:"#a03434"},
+        {name:"Submit & review (J2)",w:7,c:"#223049"},
+        {name:"Decision & revision",w:ganttWeeks[4],c:"#9a6a2e"},
+        {name:"Re-review",w:ganttWeeks[5],c:"#5a4d7a"},
+        {name:"Accept → production",w:ganttWeeks[6],c:"#0e7a64"}
+      ];
+    }
+    var total=phases.reduce(function(a,p){return a+p.w;},0)||1;
+    ganttTotalEl.textContent=total;
+    ganttGrid.innerHTML="";
+    var cum=0;
+    phases.forEach(function(p,i){
+      var editable=!cascade;
+      var lab=document.createElement("div");lab.className="glabel";
+      lab.innerHTML=esc(p.name)+(editable?' <input type="number" min="0" step="1" value="'+p.w+'" data-g="'+i+'">':' <span style="font-family:var(--mono);font-size:11px;color:var(--muted)">'+p.w+'w</span>');
+      ganttGrid.appendChild(lab);
+      var track=document.createElement("div");track.className="gtrack";
+      var bar=document.createElement("div");bar.className="gbar";
+      bar.style.left=(cum/total*100)+"%";
+      bar.style.width=Math.max(2,p.w/total*100)+"%";
+      bar.style.background=p.c;
+      bar.textContent=p.w+"w";
+      track.appendChild(bar);ganttGrid.appendChild(track);
+      cum+=p.w;
+    });
+    if(!cascade){
+      ganttGrid.querySelectorAll("[data-g]").forEach(function(inp){
+        inp.addEventListener("input",function(){ganttWeeks[+inp.dataset.g]=parseFloat(inp.value)||0;renderGantt();});
+      });
+    }
+    // ticks
+    ganttTicks.innerHTML="";
+    var steps=4;
+    for(var t=0;t<=steps;t++){
+      var s=document.createElement("span");s.className="gtick";
+      s.style.left=(t/steps*100)+"%";s.textContent=Math.round(total*t/steps)+"w";
+      ganttTicks.appendChild(s);
+    }
+  }
+  document.getElementById("cascade").addEventListener("change",renderGantt);
+
+  // ---------- controls ----------
+  document.getElementById("addRow").addEventListener("click",function(){
+    rows.push({name:"New journal",if_:5,rate:25,fit:3,wk:6,apc:2500});render();
+  });
+  document.getElementById("resetRows").addEventListener("click",function(){
+    rows=DEFAULTS.map(function(d){return Object.assign({},d);});render();
+  });
+  function setMode(m){
+    mode=m;
+    document.getElementById("modeEIM").classList.toggle("on",m==="eim");
+    document.getElementById("modeBal").classList.toggle("on",m==="bal");
+    render();
+  }
+  document.getElementById("modeEIM").addEventListener("click",function(){setMode("eim");});
+  document.getElementById("modeBal").addEventListener("click",function(){setMode("bal");});
+
+  // ---------- helpers + render ----------
+  function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});}
+  function fmt(n){return (Math.round(n)||0).toLocaleString();}
+  function context(){
+    var maxIF=0,maxP=0,minWk=Infinity,minApc=Infinity;
+    rows.forEach(function(r){
+      maxIF=Math.max(maxIF,r.if_);maxP=Math.max(maxP,pAccept(r));
+      if(r.wk>0)minWk=Math.min(minWk,r.wk);
+      if(r.apc>0)minApc=Math.min(minApc,r.apc);
+    });
+    if(minWk===Infinity)minWk=1;if(minApc===Infinity)minApc=0;
+    return {maxIF:maxIF,maxP:maxP,minWk:minWk,minApc:minApc};
+  }
+  function render(){var ctx=context();renderTable(ctx);renderVerdict(ctx);}
+  render();renderGantt();
+})();
+</script>
+</body>
+</html>
