@@ -6,7 +6,7 @@ message: >-
 type: software
 authors:
   - name: "Submission Desk contributors"
-repository-code: "https://github.com/YOUR-USERNAME/submission-desk"
+repository-code: "https://github.com/htlin222/submission-desk"
 abstract: >-
   A dependency-free, single-file web tool that turns journal selection into a
   reproducible procedure: binary eligibility gates, an explicit scoring model

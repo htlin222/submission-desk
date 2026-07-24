@@ -27,7 +27,7 @@ Thanks for looking. This is a small, deliberately simple project — the whole t
 ## Making a change
 
 ```bash
-git clone https://github.com/YOUR-USERNAME/submission-desk.git
+git clone https://github.com/htlin222/submission-desk.git
 cd submission-desk
 python3 -m http.server 8000    # then open http://localhost:8000
 ```

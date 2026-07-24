@@ -1,183 +1,84 @@
-# Submission Desk
+# 📮 Submission Desk
 
-A single-file, dependency-free tool for deciding **where to send a manuscript** — repeatably.
+*Where do I send this manuscript? — answered by arithmetic instead of by 3 a.m. despair.*
 
-Journal choice is usually made by feel, or by walking down an impact-factor list. Submission Desk splits it into three steps that give the same answer every time you feed it the same inputs: **hard gates → scoring → ranked ladder**, plus a status flow and a timeline so you can see what a stretch submission actually costs in weeks.
+You wrote a paper. Congratulations, you beautiful disaster. Now comes the part nobody trained you for: picking a journal without (a) aiming so high you spend eight months collecting rejection emails like Pokémon, or (b) aiming so low your advisor makes That Face.
 
-**[Open the tool →](https://YOUR-USERNAME.github.io/submission-desk/)** · **[繁體中文版 →](https://YOUR-USERNAME.github.io/submission-desk/zh-TW/)**
+Submission Desk turns "where do I submit?" from a vibes-based coin flip into a **repeatable, boring, wonderfully defensible procedure**: hard gates → scoring → a ranked ladder. Same inputs, same answer, every time. It has no opinions about your h-index.
 
-No build step, no install, no tracking, no storage. Open `index.html` in a browser and it works offline.
+**[▶ Open the tool](https://submission-desk.pages.dev/)** · **[▶ 繁體中文版](https://submission-desk.pages.dev/zh-TW/)**
 
----
-
-## Contents
-
-- [What it does](#what-it-does)
-- [The method](#the-method)
-- [Evidence base](#evidence-base) ← read this before trusting the numbers
-- [Filling the table from Crossref](#filling-the-table-from-crossref)
-- [Running it](#running-it)
-- [Repo layout](#repo-layout)
-- [Contributing](#contributing)
-- [Citing](#citing)
-- [License](#license)
+No build step. No install. No tracking. No account. No "we value your privacy" banner that values the opposite. One HTML file that works offline on a plane — which is where most of these decisions get made anyway.
 
 ---
 
-## What it does
+## What it actually does (in tabs, so it fits a slide)
 
-**1. Hard gates.** Five binary requirements — scope match, indexing, legitimacy, APC within budget, article type accepted. Fail any one and the journal is out; no scoring happens until all five clear. This is what stops the shortlist from being a matter of taste.
+1. **Gates** — five yes/no questions. Fail one and the journal is ejected *before* it can charm you with its impact factor. Non-negotiable, like a bouncer with a rubric.
+2. **Candidates** — an editable table: IF, acceptance rate, fit (1–5), weeks-to-decision, APC. Two ranking modes: *Expected Yield* (default, the grown-up choice) and *Balanced* (sliders, for when you need to feel in control).
+3. **Verdict** — a ranked ladder with a `→ SUBMIT HERE` stamp on the winner. The stamp is deeply satisfying. That's most of the value, honestly.
+4. **Sensitivity · Trade-off · Simulation · Compare** *(the 繁中 version has the full quant pack)* — a tornado chart, a Pareto trade-off scatter, a seeded Monte Carlo ("is your #1 actually robust or just lucky?"), and an Expected-Yield-vs-Balanced bump chart. For the moment 15 minutes into the talk when someone asks "but how sensitive is that?"
+5. **Flow + Timeline** — eight fixed submission states and an editable Gantt with an "add a rejection cycle" toggle, so the true cost of Aiming High is measured in weeks instead of optimism.
 
-**2. Scoring.** An editable table of candidates: impact factor, acceptance rate, fit (1–5), weeks to first decision, APC. Two ranking modes:
-
-- **Expected Yield** — ranks by impact captured per unit time. Default.
-- **Balanced** — a weighted blend of prestige, acceptance odds, speed and cost, with sliders.
-
-**3. Verdict.** A ranked ladder. Same inputs, same order, every time.
-
-**4. Flow.** Eight fixed submission states, with the reject → next-journal loop made explicit so a rejection doesn't restart the deliberation.
-
-**5. Timeline.** An editable Gantt of the phases, with a toggle that adds a rejection-and-resubmission cycle so the cost of aiming high is visible in weeks rather than vibes.
-
-## The method
-
-Acceptance probability is modelled as the published acceptance rate modified by how well the manuscript fits:
+## The one formula you should know
 
 ```
-P_accept = clamp( (rate / 100) × fitFactor , 0.02 , 0.95 )
-fitFactor = 0.5 / 0.75 / 1.0 / 1.3 / 1.6   for fit scores 1–5
+P_accept = clamp( (rate/100) × fitFactor , 0.02 , 0.95 )    fitFactor: 0.5 0.75 1.0 1.3 1.6 for fit 1–5
+EIM      = P_accept × IF / (weeks / 4.345)
 ```
 
-**Expected Yield** then ranks by expected impact per month:
+Translation: raw impact factor flatters journals that (a) won't take you and (b) take forever to say no. Dividing by time-to-decision politely tells those journals to sit down. Full derivation, provenance, and a candid list of where the model is frankly guessing: **[docs/METHOD.md](docs/METHOD.md)**.
 
-```
-EIM = P_accept × IF / (weeks / 4.345)
-```
+## Is any of this real, or did you just make it up?
 
-The intuition: raw impact factor over-rewards journals you are unlikely to get into and that take a long time to say no. Dividing by time-to-decision discounts that.
+Both! And — refreshingly — the tool tells you which is which:
 
-**Balanced** min-max normalizes each criterion across the candidate set and combines them under user-set weights.
+- **Backed by actual research:** fit-first ranking (Rees et al. 2022: prioritising fit roughly *doubled* first-choice acceptance odds, OR 2.11), and time-discounted expected value (Salinas & Munch 2015, whose properly-derived index `EIM` shamelessly simplifies).
+- **Vibes, clearly labelled `heuristic` in the UI:** the fit multipliers, the multiplicative form, the clamp bounds, the default weights. Plausible. Internally consistent. Uncalibrated. If you have data to fix them, that's the best pull request this repo could receive.
 
-Full derivation, parameter provenance, and known weaknesses: **[docs/METHOD.md](docs/METHOD.md)**.
+The honest one-liner the evidence supports: **descending the impact-factor ladder costs you little in citations, but a lot in time and first-try success.** Counter-evidence and references live in [docs/METHOD.md](docs/METHOD.md).
 
-## Evidence base
-
-Some of this tool is grounded in published research. Some of it is a reasonable-looking guess. The distinction matters, so it is documented rather than buried.
-
-### Empirically supported
-
-**Fit-first ranking.** Rees et al. (2022) surveyed 691 health-professions-education corresponding authors about a specific published paper. Prioritising fit roughly doubled the odds of acceptance at the first-choice journal (OR 2.11, 95% CI 1.55–2.88); prioritising speed of dissemination also helped (OR 1.80, 1.41–2.29). Prioritising *impact* cut the odds (OR 0.37, 0.28–0.49), as did deciding on the target journal late in the writing process (OR 0.77, 0.66–0.89). This is the strongest single result behind the tool's design.
-
-**Time-discounted expected value.** Salinas & Munch (2015) derived a Markov decision process for submission sequences, parameterized with acceptance probability, submission-to-decision time and impact factor for 61 ecology journals. Their closed-form index has the same skeleton as `EIM` and correlates with their full model at Spearman ρ = 0.920. Their version is properly derived; `EIM` is a simplification of it.
-
-**Default timeline values.** Taken from Rees et al.: mean 8.4 weeks to first decision, 19.6 weeks from first submission to final acceptance, 1.5 journals per paper, 6.7 weeks to first decision at the second journal, 98% of first-choice acceptances requiring revision.
-
-### Not calibrated — author-set heuristics
-
-These are labelled `heuristic` in the UI. They are plausible, internally consistent, and **unvalidated**:
-
-- the fit multipliers (0.5 / 0.75 / 1.0 / 1.3 / 1.6)
-- the multiplicative form `rate × fitFactor` itself
-- the probability clamp bounds (0.02, 0.95)
-- the default Balanced weights (35 / 30 / 20 / 15)
-- dividing by months rather than discounting against a career time-horizon *T*, as Salinas & Munch do
-
-If you have data that would calibrate any of these, that is the single most valuable contribution this repo could receive.
-
-### Where the evidence pushes back
-
-The tool's framing implies that walking down an impact-factor list is a poor strategy. Salinas & Munch tested exactly that and found it milder than expected: following the IF ranking never returned less than 90% of the optimal expected citations over horizons beyond three years, and stayed around 70% of optimal within subject-specific subsets. Their conclusion was that for an author who only wants citations and will keep resubmitting, the IF heuristic is not a bad strategy.
-
-The cost of IF-chasing shows up elsewhere: in their model, authors willing to give up 4–14 citations could save 0.5–1.5 resubmissions and 30–150 days. Combined with the Rees finding above, the accurate claim is narrower than "IF is a trap":
-
-> **Descending the IF ladder costs you relatively little in citations, but a lot in time and in first-submission success.**
-
-Use Expected Yield if time and morale are the binding constraints. Use Balanced with prestige weighted high if a specific journal is a hard career requirement. Neither mode is a substitute for reading the journal.
-
-### A data caveat you cannot design around
-
-Acceptance rates and decision times are frequently unpublished. Salinas & Munch obtained usable data from only 61 of 131 journals contacted and closed their paper by urging journals to release these figures; a later emergency-medicine review described submission choice as a subjective, non-evidence-based step embedded in otherwise objective scientific work. The two hardest columns in this tool are hard for structural reasons. Treat them as estimates and record where each number came from.
-
-### References
-
-- Rees EL, Burton O, Asif A, Eva KW. A method for the madness: an international survey of health professions education authors' journal choice. *Perspectives on Medical Education*. 2022;11(3):165–172. doi:10.1007/s40037-022-00698-9
-- Salinas S, Munch SB. Where should I send it? Optimizing the submission decision process. *PLOS ONE*. 2015;10(1):e0115451. doi:10.1371/journal.pone.0115451
-- Rodriguez RM, Chan V, Wong AHK, Montoy JCC. A review of journal impact metrics and characteristics to assist emergency medicine investigators with manuscript submission decisions. *Western Journal of Emergency Medicine*. 2020;21(4). doi:10.5811/westjem.2020.4.47030
-- Calcagno V, Demoinet E, Gollner K, Guidi L, Ruths D, de Mazancourt C. Flows of research manuscripts among scientific journals reveal hidden submission patterns. *Science*. 2012;338(6110):1065–1069. doi:10.1126/science.1227833
-- Björk BC, Solomon D. The publishing delay in scholarly peer-reviewed journals. *Journal of Informetrics*. 2013;7(4):914–923. doi:10.1016/j.joi.2013.09.001
-
-## Filling the table from Crossref
-
-Two of the five columns can come from a public source instead of a guess:
+## Run it (the hard way, i.e. not hard)
 
 ```bash
-python3 tools/crossref_index.py --issn 1741-7015 2045-2322 \
-    --mailto you@university.edu -o data/snapshots/mine-2026-07-24.json
-```
-
-Then use **Load Crossref snapshot** in the tool. The file is read locally; no network call is made from the page, and nothing is stored.
-
-Because Crossref is a living corpus, a live query is not reproducible. The snapshot is the deterministic artefact: it records every request URL, every pinned parameter, and a SHA-256 over the raw responses, so the figures stay fixed and stay auditable. `--verify` re-runs and reports drift.
-
-**What it can supply:** a citation rate (an IF-shaped proxy from open citation counts), median submission-to-acceptance time, acceptance-to-issue time, annual article volume, and a licence-coverage hint.
-
-**What it cannot:** acceptance rate and APC are not in Crossref and stay manual. Fit is a property of the manuscript-journal pairing, not of the journal, so no database will ever hold it.
-
-**Coverage gating.** Metadata deposit is uneven — Springer Nature titles deposit article history on ~97–100% of articles, many society journals on none. Below 30% coverage the tool returns `null` with a reason instead of a median over stragglers. A figure computed from 3% of articles looks identical to one computed from 97%; that is the failure mode worth designing against.
-
-Details, caveats and the pinned-parameter list: **[docs/CROSSREF.md](docs/CROSSREF.md)**.
-
-## Running it
-
-```bash
-git clone https://github.com/YOUR-USERNAME/submission-desk.git
+git clone https://github.com/htlin222/submission-desk.git
 cd submission-desk
-./tools/setup.sh your-github-username   # rewrites the placeholder URLs
-open index.html          # macOS
-xdg-open index.html      # Linux
-start index.html         # Windows
+open index.html        # macOS   ·   xdg-open (Linux)   ·   start (Windows)
 ```
 
-Or serve it, if your browser is strict about local files:
+Browser being precious about local files?
 
 ```bash
-python3 -m http.server 8000
-# then visit http://localhost:8000
+python3 -m http.server 8000   # → http://localhost:8000
 ```
 
-To publish your own copy: enable **Settings → Pages → Source: GitHub Actions**. The included workflow deploys on every push to `main`.
+## Deploying your own copy → Cloudflare Pages
 
-## Repo layout
+This repo ships a GitHub Actions pipeline that publishes the site to **Cloudflare Pages** on every push to `main`. Add two repository secrets and you're live:
 
+| Secret | Where to get it |
+|---|---|
+| `CLOUDFLARE_API_TOKEN` | Cloudflare dashboard → My Profile → API Tokens → *Create Token* → **"Cloudflare Pages — Edit"** template |
+| `CLOUDFLARE_ACCOUNT_ID` | Cloudflare dashboard → Workers & Pages → Account ID in the right sidebar |
+
+The workflow **creates the Pages project on first run**, so you never have to touch the dashboard's click-maze. Set the secrets under *Settings → Secrets and variables → Actions*, then re-run the workflow. (A GitHub Pages workflow is also included, for traditionalists.)
+
+## Filling the table without guessing
+
+Two of the five columns can come from Crossref instead of your imagination:
+
+```bash
+python3 tools/crossref_index.py --issn 1741-7015 2045-2322 --mailto you@uni.edu -o data/snapshots/mine.json
 ```
-submission-desk/
-├── index.html              # the tool (English) — GitHub Pages entry point
-├── zh-TW/index.html        # the tool (Traditional Chinese)
-├── docs/METHOD.md          # derivation, parameter provenance, limitations
-├── docs/CROSSREF.md        # deriving journal figures from Crossref
-├── tools/crossref_index.py # snapshot builder (stdlib only)
-├── data/snapshots/         # dated, hashed snapshots — committed as evidence
-├── .github/workflows/      # Pages deployment
-├── CITATION.cff            # citation metadata
-├── CONTRIBUTING.md
-├── CHANGELOG.md
-└── LICENSE                 # MIT
-```
 
-Both HTML files are self-contained: markup, styles and logic in one document, no bundler, no runtime dependencies. Web fonts load from Google Fonts and degrade to system faces offline.
+Then hit **Load Crossref snapshot** in the tool. Read locally, no network call, nothing stored. Acceptance rate, APC, and fit stay manual because the universe refuses to make them easy. More: **[docs/CROSSREF.md](docs/CROSSREF.md)**.
 
-## Contributing
+## Cite · Contribute · License
 
-Calibration data is the most useful thing you can bring — see [CONTRIBUTING.md](CONTRIBUTING.md). Field-specific presets, translations, and accessibility fixes are all welcome. Please keep each version single-file and dependency-free.
-
-## Citing
-
-If this tool informs a methods section or a lab guide, cite it via [CITATION.cff](CITATION.cff) — GitHub renders a "Cite this repository" button from it. Please cite the underlying research directly for any claim about the method; the papers above did the work.
-
-## License
-
-[MIT](LICENSE). Swap it if your institution requires something else — the tool has no dependencies whose licenses would constrain you.
+- **Cite:** there's a [CITATION.cff](CITATION.cff) (GitHub renders a "Cite this repository" button). But please cite the *actual papers* for any actual claim — they did the work.
+- **Contribute:** calibration data beats everything. Translations, field presets, and a11y fixes are all welcome. Keep each version single-file and dependency-free. See [CONTRIBUTING.md](CONTRIBUTING.md).
+- **License:** [MIT](LICENSE). Do whatever. We are not going to email you.
 
 ---
 
-*Nothing in this tool is stored or transmitted. Reloading the page clears everything.*
+*Nothing is stored or transmitted. Reloading the page nukes everything — a tiny, private, academic Etch A Sketch.*
