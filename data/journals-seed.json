@@ -15,7 +15,8 @@
       "is_oa": false,
       "field": "",
       "openalex": "https://openalex.org/S110447773",
-      "homepage": "https://www.sciencedirect.com/journal/cell"
+      "homepage": "https://www.sciencedirect.com/journal/cell",
+      "jif": 45
     },
     {
       "name": "Nature Medicine",
@@ -28,7 +29,8 @@
       "is_oa": false,
       "field": "",
       "openalex": "https://openalex.org/S203256638",
-      "homepage": "http://www.nature.com/nm/index.html"
+      "homepage": "http://www.nature.com/nm/index.html",
+      "jif": 58
     },
     {
       "name": "New England Journal of Medicine",
@@ -41,7 +43,8 @@
       "is_oa": false,
       "field": "",
       "openalex": "https://openalex.org/S62468778",
-      "homepage": "http://www.nejm.org/"
+      "homepage": "http://www.nejm.org/",
+      "jif": 96
     },
     {
       "name": "Science",
@@ -54,7 +57,8 @@
       "is_oa": false,
       "field": "",
       "openalex": "https://openalex.org/S3880285",
-      "homepage": "http://www.sciencemag.org/"
+      "homepage": "http://www.sciencemag.org/",
+      "jif": 45
     },
     {
       "name": "The Lancet",
@@ -67,7 +71,8 @@
       "is_oa": false,
       "field": "",
       "openalex": "https://openalex.org/S49861241",
-      "homepage": "https://www.sciencedirect.com/journal/the-lancet"
+      "homepage": "https://www.sciencedirect.com/journal/the-lancet",
+      "jif": 98
     },
     {
       "name": "Nature",
@@ -80,7 +85,8 @@
       "is_oa": false,
       "field": "",
       "openalex": "https://openalex.org/S137773608",
-      "homepage": "https://www.nature.com/nature/"
+      "homepage": "https://www.nature.com/nature/",
+      "jif": 50
     },
     {
       "name": "Nature Communications",
@@ -93,7 +99,8 @@
       "is_oa": true,
       "field": "",
       "openalex": "https://openalex.org/S64187185",
-      "homepage": "http://www.nature.com/ncomms/index.html"
+      "homepage": "http://www.nature.com/ncomms/index.html",
+      "jif": 15
     },
     {
       "name": "The Lancet Digital Health",
@@ -106,7 +113,8 @@
       "is_oa": true,
       "field": "",
       "openalex": "https://openalex.org/S4210237014",
-      "homepage": "https://www.journals.elsevier.com/the-lancet-digital-health"
+      "homepage": "https://www.journals.elsevier.com/the-lancet-digital-health",
+      "jif": 24
     },
     {
       "name": "Diabetes Care",
@@ -119,7 +127,8 @@
       "is_oa": false,
       "field": "",
       "openalex": "https://openalex.org/S49878492",
-      "homepage": "http://care.diabetesjournals.org/"
+      "homepage": "http://care.diabetesjournals.org/",
+      "jif": 16
     },
     {
       "name": "The Lancet Oncology",
@@ -132,7 +141,8 @@
       "is_oa": false,
       "field": "",
       "openalex": "https://openalex.org/S116900674",
-      "homepage": "https://www.journals.elsevier.com/the-lancet-oncology"
+      "homepage": "https://www.journals.elsevier.com/the-lancet-oncology",
+      "jif": 51
     },
     {
       "name": "Journal of Clinical Investigation",
@@ -145,7 +155,8 @@
       "is_oa": true,
       "field": "",
       "openalex": "https://openalex.org/S114430552",
-      "homepage": "http://www.jci.org/"
+      "homepage": "http://www.jci.org/",
+      "jif": 15
     },
     {
       "name": "JAMA",
@@ -158,7 +169,8 @@
       "is_oa": false,
       "field": "",
       "openalex": "https://openalex.org/S172573765",
-      "homepage": "http://jama.ama-assn.org/"
+      "homepage": "http://jama.ama-assn.org/",
+      "jif": 63
     },
     {
       "name": "Heliyon",
@@ -171,7 +183,8 @@
       "is_oa": true,
       "field": "",
       "openalex": "https://openalex.org/S2898612692",
-      "homepage": "https://www.sciencedirect.com/journal/heliyon"
+      "homepage": "https://www.sciencedirect.com/journal/heliyon",
+      "jif": 4.0
     },
     {
       "name": "Proceedings of the National Academy of Sciences",
@@ -184,7 +197,8 @@
       "is_oa": false,
       "field": "",
       "openalex": "https://openalex.org/S125754415",
-      "homepage": "http://www.pnas.org/"
+      "homepage": "http://www.pnas.org/",
+      "jif": 11
     },
     {
       "name": "PLoS Medicine",
@@ -197,7 +211,8 @@
       "is_oa": true,
       "field": "",
       "openalex": "https://openalex.org/S197939330",
-      "homepage": "http://www.plosmedicine.org/"
+      "homepage": "http://www.plosmedicine.org/",
+      "jif": 15
     },
     {
       "name": "JAMA Internal Medicine",
@@ -210,7 +225,8 @@
       "is_oa": false,
       "field": "",
       "openalex": "https://openalex.org/S65364685",
-      "homepage": "http://archinte.ama-assn.org/"
+      "homepage": "http://archinte.ama-assn.org/",
+      "jif": 39
     },
     {
       "name": "Radiology",
@@ -223,7 +239,8 @@
       "is_oa": false,
       "field": "",
       "openalex": "https://openalex.org/S50280174",
-      "homepage": "http://radiology.rsna.org/"
+      "homepage": "http://radiology.rsna.org/",
+      "jif": 19
     },
     {
       "name": "Scientific Reports",
@@ -236,7 +253,8 @@
       "is_oa": true,
       "field": "",
       "openalex": "https://openalex.org/S196734849",
-      "homepage": "http://www.nature.com/srep/index.html"
+      "homepage": "http://www.nature.com/srep/index.html",
+      "jif": 4.0
     },
     {
       "name": "Annals of Internal Medicine",
@@ -249,7 +267,8 @@
       "is_oa": false,
       "field": "",
       "openalex": "https://openalex.org/S119722071",
-      "homepage": "http://www.annals.org/"
+      "homepage": "http://www.annals.org/",
+      "jif": 40
     },
     {
       "name": "BMC Medical Education",
@@ -262,7 +281,8 @@
       "is_oa": true,
       "field": "",
       "openalex": "https://openalex.org/S144187503",
-      "homepage": "https://bmcmededuc.biomedcentral.com/"
+      "homepage": "https://bmcmededuc.biomedcentral.com/",
+      "jif": 3.6
     },
     {
       "name": "Medical Teacher",
@@ -275,7 +295,8 @@
       "is_oa": false,
       "field": "",
       "openalex": "https://openalex.org/S135934248",
-      "homepage": "http://informahealthcare.com/journal/mte"
+      "homepage": "http://informahealthcare.com/journal/mte",
+      "jif": 4.7
     },
     {
       "name": "Perspectives on Medical Education",
@@ -288,7 +309,8 @@
       "is_oa": true,
       "field": "",
       "openalex": "https://openalex.org/S2764699106",
-      "homepage": "https://www.springer.com/journal/40037"
+      "homepage": "https://www.springer.com/journal/40037",
+      "jif": 5.5
     },
     {
       "name": "PeerJ",
@@ -301,7 +323,8 @@
       "is_oa": true,
       "field": "",
       "openalex": "https://openalex.org/S1983995261",
-      "homepage": "http://www.peerj.com/"
+      "homepage": "http://www.peerj.com/",
+      "jif": 2.9
     },
     {
       "name": "PLoS ONE",
@@ -314,7 +337,8 @@
       "is_oa": true,
       "field": "",
       "openalex": "https://openalex.org/S202381698",
-      "homepage": "http://www.plosone.org/"
+      "homepage": "http://www.plosone.org/",
+      "jif": 3.7
     },
     {
       "name": "Advances in Health Sciences Education",
@@ -327,7 +351,8 @@
       "is_oa": false,
       "field": "",
       "openalex": "https://openalex.org/S129194695",
-      "homepage": "https://www.springer.com/journal/10459"
+      "homepage": "https://www.springer.com/journal/10459",
+      "jif": 3.7
     },
     {
       "name": "Anesthesiology",
@@ -340,7 +365,8 @@
       "is_oa": false,
       "field": "",
       "openalex": "https://openalex.org/S124035732",
-      "homepage": "http://journals.lww.com/anesthesiology/pages/default.aspx"
+      "homepage": "http://journals.lww.com/anesthesiology/pages/default.aspx",
+      "jif": 9.0
     },
     {
       "name": "Medical Education",
@@ -353,7 +379,8 @@
       "is_oa": false,
       "field": "",
       "openalex": "https://openalex.org/S54816476",
-      "homepage": "https://onlinelibrary.wiley.com/journal/13652923"
+      "homepage": "https://onlinelibrary.wiley.com/journal/13652923",
+      "jif": 5.6
     },
     {
       "name": "BMJ Open",
@@ -366,7 +393,8 @@
       "is_oa": true,
       "field": "",
       "openalex": "https://openalex.org/S79054089",
-      "homepage": "http://bmjopen.bmj.com/"
+      "homepage": "http://bmjopen.bmj.com/",
+      "jif": 2.9
     },
     {
       "name": "Circulation",
@@ -379,7 +407,8 @@
       "is_oa": false,
       "field": "",
       "openalex": "https://openalex.org/S116251202",
-      "homepage": "http://circ.ahajournals.org/"
+      "homepage": "http://circ.ahajournals.org/",
+      "jif": 37
     },
     {
       "name": "Academic Medicine",
@@ -392,7 +421,8 @@
       "is_oa": false,
       "field": "",
       "openalex": "https://openalex.org/S19793444",
-      "homepage": "http://journals.lww.com/academicmedicine/pages/default.aspx"
+      "homepage": "http://journals.lww.com/academicmedicine/pages/default.aspx",
+      "jif": 5.3
     },
     {
       "name": "Teaching and Learning in Medicine",
@@ -405,7 +435,8 @@
       "is_oa": false,
       "field": "",
       "openalex": "https://openalex.org/S19371312",
-      "homepage": "https://www.tandfonline.com/toc/htlm20/current"
+      "homepage": "https://www.tandfonline.com/toc/htlm20/current",
+      "jif": 2.5
     },
     {
       "name": "eLife",
@@ -418,7 +449,8 @@
       "is_oa": true,
       "field": "",
       "openalex": "https://openalex.org/S1336409049",
-      "homepage": "http://elifesciences.org/"
+      "homepage": "http://elifesciences.org/",
+      "jif": 7.7
     },
     {
       "name": "Journal of Clinical Oncology",
@@ -431,7 +463,8 @@
       "is_oa": false,
       "field": "",
       "openalex": "https://openalex.org/S15137598",
-      "homepage": "http://www.jco.org/"
+      "homepage": "http://www.jco.org/",
+      "jif": 45
     },
     {
       "name": "Blood",
@@ -444,7 +477,8 @@
       "is_oa": false,
       "field": "",
       "openalex": "https://openalex.org/S200071133",
-      "homepage": "https://www.sciencedirect.com/journal/blood"
+      "homepage": "https://www.sciencedirect.com/journal/blood",
+      "jif": 21
     },
     {
       "name": "Journal of the American College of Cardiology",
@@ -457,7 +491,8 @@
       "is_oa": false,
       "field": "",
       "openalex": "https://openalex.org/S60865174",
-      "homepage": "https://www.sciencedirect.com/journal/journal-of-the-american-college-of-cardiology"
+      "homepage": "https://www.sciencedirect.com/journal/journal-of-the-american-college-of-cardiology",
+      "jif": 24
     },
     {
       "name": "Cureus",
@@ -470,7 +505,8 @@
       "is_oa": true,
       "field": "",
       "openalex": "https://openalex.org/S2738950867",
-      "homepage": "https://www.cureus.com/"
+      "homepage": "https://www.cureus.com/",
+      "jif": 1.2
     },
     {
       "name": "CHEST Journal",
@@ -483,7 +519,8 @@
       "is_oa": false,
       "field": "",
       "openalex": "https://openalex.org/S76900504",
-      "homepage": "https://www.sciencedirect.com/journal/chest"
+      "homepage": "https://www.sciencedirect.com/journal/chest",
+      "jif": 9.5
     },
     {
       "name": "Gastroenterology",
@@ -496,7 +533,8 @@
       "is_oa": false,
       "field": "",
       "openalex": "https://openalex.org/S143352558",
-      "homepage": "https://www.sciencedirect.com/journal/gastroenterology"
+      "homepage": "https://www.sciencedirect.com/journal/gastroenterology",
+      "jif": 29
     },
     {
       "name": "American Journal of Respiratory and Critical Care Medicine",
@@ -509,7 +547,8 @@
       "is_oa": false,
       "field": "",
       "openalex": "https://openalex.org/S93356601",
-      "homepage": "http://www.atsjournals.org/journal/ajrccm"
+      "homepage": "http://www.atsjournals.org/journal/ajrccm",
+      "jif": 24
     },
     {
       "name": "BMJ",
@@ -522,8 +561,10 @@
       "is_oa": false,
       "field": "",
       "openalex": "https://openalex.org/S4393911389",
-      "homepage": ""
+      "homepage": "",
+      "jif": 94
     }
   ],
-  "note_if_proxy": "0.0 values (data artifacts, e.g. news-heavy journals) set to null; verify official JIF at JCR."
+  "note_if_proxy": "0.0 values (data artifacts, e.g. news-heavy journals) set to null; verify official JIF at JCR.",
+  "note_jif": "jif = curated approximate recent Journal Impact Factor (JCR-ish, 2022-2023). Verify current value at JCR."
 }
