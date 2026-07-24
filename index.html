@@ -49,7 +49,7 @@
   html,body{height:100%}
   body{
     margin:0;background:var(--canvas);color:var(--ink);
-    font-family:var(--body);font-size:15px;line-height:1.5;
+    font-family:var(--body);font-size:16px;line-height:1.5;
     -webkit-font-smoothing:antialiased;
     display:flex;flex-direction:column;overflow:hidden;
   }
@@ -102,20 +102,20 @@
   /* ---------- glossary accordion ---------- */
   .gloss{display:grid;gap:8px;max-width:840px;margin-top:6px}
   .gloss details{border:1px solid var(--line);border-radius:8px;background:var(--panel);overflow:hidden}
-  .gloss summary{cursor:pointer;padding:11px 14px;font-weight:600;font-size:13.5px;list-style:none;display:flex;align-items:center;gap:8px}
+  .gloss summary{cursor:pointer;padding:11px 14px;font-weight:600;font-size:14.5px;list-style:none;display:flex;align-items:center;gap:8px}
   .gloss summary::-webkit-details-marker{display:none}
   .gloss summary .ic{color:var(--slate-2)}
   .gloss summary::after{content:"";margin-left:auto;width:7px;height:7px;border-right:2px solid var(--muted);border-bottom:2px solid var(--muted);transform:rotate(45deg);transition:.15s}
   .gloss details[open] summary::after{transform:rotate(-135deg)}
   .gloss details[open] summary{border-bottom:1px solid var(--line-soft)}
-  .gloss .gbody{padding:10px 14px 13px;font-size:12.5px;color:#39414f;line-height:1.6}
+  .gloss .gbody{padding:10px 14px 13px;font-size:14px;color:#39414f;line-height:1.6}
   .gloss .gbody code{font-family:var(--mono);font-size:11.5px;background:var(--slate);color:#eef1ee;padding:1px 5px;border-radius:3px}
   /* ---------- intro (IMRaD) ---------- */
   .imrad{max-width:860px;overflow:auto;min-height:0}
   .imrad section{margin-bottom:16px}
   .imrad h3{font-family:var(--disp);font-size:15px;color:var(--slate);margin:0 0 6px;display:flex;align-items:center;gap:8px}
   .imrad h3 .ic{color:var(--verdict)}
-  .imrad p{margin:0;font-size:13.5px;line-height:1.65;color:#39414f}
+  .imrad p{margin:0;font-size:14.5px;line-height:1.65;color:#39414f}
   .imrad code{font-family:var(--mono);font-size:12px;background:var(--slate);color:#eef1ee;padding:1px 5px;border-radius:3px}
   .an-legend{flex:none;display:flex;gap:14px;flex-wrap:wrap;font-size:11.5px;color:var(--muted);margin-bottom:8px}
   .an-legend b{font-weight:600}
@@ -145,7 +145,7 @@
   .tabpanel:focus{outline:none}
   .phead{flex:none;display:flex;align-items:baseline;gap:12px;margin-bottom:14px;flex-wrap:wrap}
   .phead h2{font-family:var(--disp);font-weight:600;font-size:19px;letter-spacing:-.01em;margin:0}
-  .phead p{margin:0;color:var(--muted);font-size:13px}
+  .phead p{margin:0;color:var(--muted);font-size:14px}
   .pbody{flex:1;min-height:0;display:flex;flex-direction:column}
   .panel{
     background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:18px;
@@ -171,8 +171,8 @@
   }
   .gates input:focus-visible{outline:2px solid var(--slate-2);outline-offset:2px}
   .gate-txt strong{font-weight:600;display:block;font-size:15px;margin-bottom:2px}
-  .gate-txt span{color:var(--muted);font-size:12.5px}
-  .gates-note{flex:none;margin-top:14px;font-size:12.5px;color:var(--muted)}
+  .gate-txt span{color:var(--muted);font-size:14px}
+  .gates-note{flex:none;margin-top:14px;font-size:14px;color:var(--muted)}
   .gates-note b{color:var(--slate)}
 
   /* ---------- candidates (2-col) ---------- */
@@ -228,7 +228,7 @@
   .res-group{margin-bottom:18px}
   .res-group h3{font-family:var(--disp);font-size:14px;color:var(--slate);margin:0 0 8px}
   .res-list{display:grid;gap:8px}
-  .res-item{font-size:13px;line-height:1.55}
+  .res-item{font-size:14px;line-height:1.55}
   .res-item a{font-weight:600;color:var(--verdict);text-decoration:none;border-bottom:1px solid var(--verdict-soft)}
   .res-item a:hover{border-bottom-color:var(--verdict)}
   .res-item span{color:var(--muted)}
@@ -337,7 +337,7 @@
   .method sup{font-size:.72em}
   .method sup a{border:none;font-weight:600;padding:0 1px;color:var(--verdict);text-decoration:none}
   .refs{margin:6px 0 0;padding-left:24px;display:grid;gap:9px}
-  .refs li{font-size:12.5px;line-height:1.55;color:#39414f}
+  .refs li{font-size:14px;line-height:1.55;color:#39414f}
   .refs li::marker{color:var(--muted);font-family:var(--mono);font-size:11px}
   .refs a{font-family:var(--mono);font-size:12px;color:var(--verdict);text-decoration:none;border-bottom:1px solid var(--verdict-soft);word-break:break-all}
   .refs a:hover{border-bottom-color:var(--verdict)}
