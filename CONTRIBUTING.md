@@ -6,6 +6,8 @@ Thanks for looking. This is a small, deliberately simple project — the whole t
 
 **Calibration data.** The weakest part of this tool is the fit multipliers (`0.5 / 0.75 / 1.0 / 1.3 / 1.6`), which are an educated guess. If you have submission records — a fit score assigned *before* submission, plus the outcome — that is the single most valuable contribution possible here. Open an issue before doing any work so we can agree on a format and on anonymisation.
 
+**Crossref snapshots for your field.** Run `tools/crossref_index.py` over the journals you care about and contribute the snapshot to `data/snapshots/`. These accumulate into something genuinely useful and cost you one command.
+
 **Field-specific presets.** Real acceptance rates and decision times for a set of journals in your field, with the source for each number. These are hard to find and worth sharing.
 
 **Corrections to the evidence claims.** If the README or `docs/METHOD.md` overstates what a cited paper found, that is a bug and a serious one. Please file it.
@@ -17,6 +19,7 @@ Thanks for looking. This is a small, deliberately simple project — the whole t
 ## Ground rules
 
 - **Single file, no dependencies.** No bundler, no framework, no package manager. If a change needs a build step, it probably belongs in a fork.
+- **No storage, no network calls from the page.** The Crossref tool is a separate CLI; the browser only ever reads a local file.
 - **No storage, no network calls.** The tool holds everything in memory and sends nothing anywhere. Please keep it that way; people put unpublished work into it.
 - **Label uncalibrated numbers.** Any new parameter that is not traceable to a source gets marked `heuristic` in the UI and added to the provenance table in `docs/METHOD.md`. Honest defaults beat confident ones.
 - **Keep both language versions in sync.** A change to logic or layout in one should land in the other in the same pull request.

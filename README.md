@@ -15,6 +15,7 @@ No build step, no install, no tracking, no storage. Open `index.html` in a brows
 - [What it does](#what-it-does)
 - [The method](#the-method)
 - [Evidence base](#evidence-base) ← read this before trusting the numbers
+- [Filling the table from Crossref](#filling-the-table-from-crossref)
 - [Running it](#running-it)
 - [Repo layout](#repo-layout)
 - [Contributing](#contributing)
@@ -105,6 +106,27 @@ Acceptance rates and decision times are frequently unpublished. Salinas & Munch 
 - Calcagno V, Demoinet E, Gollner K, Guidi L, Ruths D, de Mazancourt C. Flows of research manuscripts among scientific journals reveal hidden submission patterns. *Science*. 2012;338(6110):1065–1069. doi:10.1126/science.1227833
 - Björk BC, Solomon D. The publishing delay in scholarly peer-reviewed journals. *Journal of Informetrics*. 2013;7(4):914–923. doi:10.1016/j.joi.2013.09.001
 
+## Filling the table from Crossref
+
+Two of the five columns can come from a public source instead of a guess:
+
+```bash
+python3 tools/crossref_index.py --issn 1741-7015 2045-2322 \
+    --mailto you@university.edu -o data/snapshots/mine-2026-07-24.json
+```
+
+Then use **Load Crossref snapshot** in the tool. The file is read locally; no network call is made from the page, and nothing is stored.
+
+Because Crossref is a living corpus, a live query is not reproducible. The snapshot is the deterministic artefact: it records every request URL, every pinned parameter, and a SHA-256 over the raw responses, so the figures stay fixed and stay auditable. `--verify` re-runs and reports drift.
+
+**What it can supply:** a citation rate (an IF-shaped proxy from open citation counts), median submission-to-acceptance time, acceptance-to-issue time, annual article volume, and a licence-coverage hint.
+
+**What it cannot:** acceptance rate and APC are not in Crossref and stay manual. Fit is a property of the manuscript-journal pairing, not of the journal, so no database will ever hold it.
+
+**Coverage gating.** Metadata deposit is uneven — Springer Nature titles deposit article history on ~97–100% of articles, many society journals on none. Below 30% coverage the tool returns `null` with a reason instead of a median over stragglers. A figure computed from 3% of articles looks identical to one computed from 97%; that is the failure mode worth designing against.
+
+Details, caveats and the pinned-parameter list: **[docs/CROSSREF.md](docs/CROSSREF.md)**.
+
 ## Running it
 
 ```bash
@@ -131,6 +153,9 @@ submission-desk/
 ├── index.html              # the tool (English) — GitHub Pages entry point
 ├── zh-TW/index.html        # the tool (Traditional Chinese)
 ├── docs/METHOD.md          # derivation, parameter provenance, limitations
+├── docs/CROSSREF.md        # deriving journal figures from Crossref
+├── tools/crossref_index.py # snapshot builder (stdlib only)
+├── data/snapshots/         # dated, hashed snapshots — committed as evidence
 ├── .github/workflows/      # Pages deployment
 ├── CITATION.cff            # citation metadata
 ├── CONTRIBUTING.md

@@ -147,6 +147,11 @@
   .btn:focus-visible{outline:2px solid var(--slate-2);outline-offset:2px}
 
   /* ---------- weights ---------- */
+  .filebtn{position:relative;overflow:hidden;display:inline-block}
+  .filebtn input[type=file]{position:absolute;left:0;top:0;opacity:0;width:100%;height:100%;cursor:pointer}
+  #importNote{display:none;margin-top:12px;padding:11px 14px;border:1px solid var(--slate-2);
+    border-left-width:3px;border-radius:7px;background:var(--panel);font-size:12.5px;line-height:1.65;color:#39414f}
+  #importNote b{color:var(--slate)}
   .weights{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:16px 22px;margin-top:6px}
   .wrow label{display:flex;justify-content:space-between;font-size:12.5px;color:var(--slate-2);margin-bottom:5px;font-weight:500}
   .wrow label b{font-family:var(--mono);font-weight:600;color:var(--ink)}
@@ -280,12 +285,14 @@
     </div>
     <div class="tbl-actions">
       <button class="btn" id="addRow">+ Add journal</button>
-      <button class="btn ghost" id="resetRows">Reset examples</button>
+      <button class="btn ghost" id="resetRows">Reset examples</button><span class="btn ghost filebtn">Load Crossref snapshot<input type="file" id="snapFile" accept="application/json,.json" aria-label="Load Crossref snapshot"></span>
       <div class="mode-toggle" role="group" aria-label="Ranking mode" style="margin-left:auto">
         <button id="modeEIM" class="on">EXPECTED&nbsp;YIELD</button>
         <button id="modeBal">BALANCED</button>
       </div>
     </div>
+
+    <div id="importNote" role="status"></div>
 
     <div class="panel" style="margin-top:16px">
       <label style="font-size:12.5px;color:var(--slate-2);font-weight:600;display:block;margin-bottom:12px">Balanced-mode weights <span class="flag">heuristic defaults</span> <span style="color:var(--muted);font-weight:400">(auto-normalized; ignored in Expected Yield; scores are relative to this candidate set only)</span></label>
@@ -384,6 +391,16 @@
 
   var rows=DEFAULTS.map(function(d){return Object.assign({},d);});
   var weights={};WEIGHT_DEFS.forEach(function(w){weights[w[0]]=w[2];});
+var MSG={
+    badSchema:"Not a Submission Desk Crossref snapshot.",
+    imported:function(n,d){return "<b>Imported "+n+" journal(s)</b> from a snapshot dated "+d+".";},
+    mapped:"Citation rate \u2192 IF column; median submission-to-acceptance \u2192 weeks column.",
+    noIF:function(n){return n+" had no usable citation rate (set to 0).";},
+    noLag:function(n){return n+" had no deposited article history (weeks left at default).";},
+    manual:"<b>Acceptance rate, fit and APC are not in Crossref \u2014 fill those in yourself.</b> The imported weeks figure covers submission through acceptance, so it runs longer than time to first decision; adjust if you are modelling first decisions.",
+    failed:function(m){return "<b>Import failed.</b> "+m;}
+  };
+
   var mode="eim";
   var ganttWeeks=GANTT.map(function(g){return g[1];});
 
@@ -583,6 +600,58 @@
   document.getElementById("modeBal").addEventListener("click",function(){setMode("bal");});
 
   // ---------- helpers + render ----------
+// ---------- Crossref snapshot import (local file only, no network) ----------
+  function weeksFromLag(ix){
+    var lg=ix && ix.review_lag_days;
+    return (lg && lg.value!=null) ? Math.round(lg.weeks) : null;
+  }
+  function importSnapshot(text){
+    var snap=JSON.parse(text);
+    if(!snap.schema || snap.schema.indexOf("crossref-snapshot")<0)
+      throw new Error(MSG.badSchema);
+    var added=0,noIF=0,noLag=0;
+    (snap.journals||[]).forEach(function(j){
+      var ix=j.indices||{},cr=ix.citation_rate||{},wk=weeksFromLag(ix);
+      if(cr.value==null) noIF++;
+      if(wk==null) noLag++;
+      rows.push({
+        name:(j.title||j.issn)+"",
+        if_:cr.value!=null?cr.value:0,
+        rate:25, fit:3,
+        wk:wk!=null?wk:6,
+        apc:0
+      });
+      added++;
+    });
+    render();
+    showImportNote(snap,added,noIF,noLag);
+  }
+  function showImportNote(snap,added,noIF,noLag){
+    var el=document.getElementById("importNote");
+    var stamp=(snap.provenance&&snap.provenance.snapshot_utc)||"?";
+    var parts=[MSG.imported(added,stamp.slice(0,10))];
+    parts.push(MSG.mapped);
+    if(noIF)  parts.push(MSG.noIF(noIF));
+    if(noLag) parts.push(MSG.noLag(noLag));
+    parts.push(MSG.manual);
+    el.innerHTML=parts.join(" ");
+    el.style.display="block";
+  }
+  document.getElementById("snapFile").addEventListener("change",function(e){
+    var f=e.target.files&&e.target.files[0];
+    if(!f) return;
+    var r=new FileReader();
+    r.onload=function(){
+      try{ importSnapshot(r.result); }
+      catch(err){
+        var el=document.getElementById("importNote");
+        el.innerHTML=MSG.failed(err.message); el.style.display="block";
+      }
+    };
+    r.readAsText(f);
+    e.target.value="";
+  });
+
   function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});}
   function fmt(n){return (Math.round(n)||0).toLocaleString();}
   function context(){

@@ -128,6 +128,11 @@
   .btn.ghost:hover{background:var(--panel-2)}
   .btn:focus-visible{outline:2px solid var(--slate-2);outline-offset:2px}
 
+  .filebtn{position:relative;overflow:hidden;display:inline-block}
+  .filebtn input[type=file]{position:absolute;left:0;top:0;opacity:0;width:100%;height:100%;cursor:pointer}
+  #importNote{display:none;margin-top:12px;padding:11px 14px;border:1px solid var(--slate-2);
+    border-left-width:3px;border-radius:7px;background:var(--panel);font-size:12.5px;line-height:1.65;color:#39414f}
+  #importNote b{color:var(--slate)}
   .weights{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:16px 22px;margin-top:6px}
   .wrow label{display:flex;justify-content:space-between;font-size:12.5px;color:var(--slate-2);margin-bottom:5px;font-weight:500}
   .wrow label b{font-family:var(--mono);font-weight:600;color:var(--ink)}
@@ -250,12 +255,14 @@
     </div>
     <div class="tbl-actions">
       <button class="btn" id="addRow">＋ 新增期刊</button>
-      <button class="btn ghost" id="resetRows">還原範例</button>
+      <button class="btn ghost" id="resetRows">還原範例</button><span class="btn ghost filebtn">匯入 Crossref 快照<input type="file" id="snapFile" accept="application/json,.json" aria-label="匯入 Crossref 快照"></span>
       <div class="mode-toggle" role="group" aria-label="排序模式" style="margin-left:auto">
         <button id="modeEIM" class="on">期望產出</button>
         <button id="modeBal">平衡加權</button>
       </div>
     </div>
+
+    <div id="importNote" role="status"></div>
 
     <div class="panel" style="margin-top:16px">
       <label style="font-size:12.5px;color:var(--slate-2);font-weight:700;display:block;margin-bottom:12px">平衡加權模式的權重 <span class="flag">未校準</span> <span style="color:var(--muted);font-weight:400">(自動正規化;期望產出模式下不使用;分數僅在本候選清單內可比)</span></label>
@@ -351,6 +358,16 @@
 
   var rows=DEFAULTS.map(function(d){return Object.assign({},d);});
   var weights={};WEIGHT_DEFS.forEach(function(w){weights[w[0]]=w[2];});
+var MSG={
+    badSchema:"這不是 Submission Desk 的 Crossref 快照檔。",
+    imported:function(n,d){return "<b>已匯入 "+n+" 本期刊</b>,快照日期 "+d+"。";},
+    mapped:"引用率 \u2192 IF 欄;投稿到接受的中位數 \u2192 週數欄。",
+    noIF:function(n){return "其中 "+n+" 本沒有可用的引用率(設為 0)。";},
+    noLag:function(n){return "其中 "+n+" 本的出版社未上傳審稿時程(週數維持預設值)。";},
+    manual:"<b>接受率、契合度、APC 不在 Crossref 裡,這三欄要自己填。</b>匯入的週數是「投稿到接受」,會比「到首次決議」長一截;若你要模擬的是首次決議,請自行下修。",
+    failed:function(m){return "<b>匯入失敗。</b>"+m;}
+  };
+
   var mode="eim";
   var ganttWeeks=GANTT.map(function(g){return g[1];});
 
@@ -540,6 +557,58 @@
   }
   document.getElementById("modeEIM").addEventListener("click",function(){setMode("eim");});
   document.getElementById("modeBal").addEventListener("click",function(){setMode("bal");});
+
+// ---------- Crossref snapshot import (local file only, no network) ----------
+  function weeksFromLag(ix){
+    var lg=ix && ix.review_lag_days;
+    return (lg && lg.value!=null) ? Math.round(lg.weeks) : null;
+  }
+  function importSnapshot(text){
+    var snap=JSON.parse(text);
+    if(!snap.schema || snap.schema.indexOf("crossref-snapshot")<0)
+      throw new Error(MSG.badSchema);
+    var added=0,noIF=0,noLag=0;
+    (snap.journals||[]).forEach(function(j){
+      var ix=j.indices||{},cr=ix.citation_rate||{},wk=weeksFromLag(ix);
+      if(cr.value==null) noIF++;
+      if(wk==null) noLag++;
+      rows.push({
+        name:(j.title||j.issn)+"",
+        if_:cr.value!=null?cr.value:0,
+        rate:25, fit:3,
+        wk:wk!=null?wk:6,
+        apc:0
+      });
+      added++;
+    });
+    render();
+    showImportNote(snap,added,noIF,noLag);
+  }
+  function showImportNote(snap,added,noIF,noLag){
+    var el=document.getElementById("importNote");
+    var stamp=(snap.provenance&&snap.provenance.snapshot_utc)||"?";
+    var parts=[MSG.imported(added,stamp.slice(0,10))];
+    parts.push(MSG.mapped);
+    if(noIF)  parts.push(MSG.noIF(noIF));
+    if(noLag) parts.push(MSG.noLag(noLag));
+    parts.push(MSG.manual);
+    el.innerHTML=parts.join(" ");
+    el.style.display="block";
+  }
+  document.getElementById("snapFile").addEventListener("change",function(e){
+    var f=e.target.files&&e.target.files[0];
+    if(!f) return;
+    var r=new FileReader();
+    r.onload=function(){
+      try{ importSnapshot(r.result); }
+      catch(err){
+        var el=document.getElementById("importNote");
+        el.innerHTML=MSG.failed(err.message); el.style.display="block";
+      }
+    };
+    r.readAsText(f);
+    e.target.value="";
+  });
 
   function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});}
   function fmt(n){return (Math.round(n)||0).toLocaleString();}

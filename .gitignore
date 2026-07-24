@@ -106,6 +106,13 @@ coverage/
 .nyc_output/
 lighthouse-report.*
 
+# --- Crossref data ---------------------------------------------------------
+# data/snapshots/*.json IS committed: snapshots are the reproducible evidence
+# behind a ranking. Only bulk/intermediate pulls are ignored.
+data/raw/
+data/**/*.partial.json
+data/**/*.tmp.json
+
 # --- Local scratch ---------------------------------------------------------
 # Working notes, exported CSVs of your own submission history, etc.
 # Keep your real journal data out of a public repo.
