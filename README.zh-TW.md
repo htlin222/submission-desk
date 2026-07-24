@@ -63,7 +63,7 @@ python3 -m http.server 8000   # → http://localhost:8000
 | `CLOUDFLARE_API_TOKEN` | Cloudflare 後台 → My Profile → API Tokens → *Create Token* → **「Cloudflare Pages — Edit」**範本 |
 | `CLOUDFLARE_ACCOUNT_ID` | Cloudflare 後台 → Workers & Pages → 右側欄的 Account ID |
 
-流水線會在**第一次執行時自動建立 Pages 專案**,你完全不必碰後台的點擊迷宮。到 *Settings → Secrets and variables → Actions* 設好 secret,再重跑 workflow 即可。(同時也附了一份 GitHub Pages 的 workflow,給念舊的人。)
+流水線會在**第一次執行時自動建立 Pages 專案**,你完全不必碰後台的點擊迷宮。到 *Settings → Secrets and variables → Actions* 設好 secret,再重跑 workflow,網站就上線在 `https://submission-desk.pages.dev`。
 
 ## 不靠猜也能填表
 

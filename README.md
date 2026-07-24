@@ -61,7 +61,7 @@ This repo ships a GitHub Actions pipeline that publishes the site to **Cloudflar
 | `CLOUDFLARE_API_TOKEN` | Cloudflare dashboard → My Profile → API Tokens → *Create Token* → **"Cloudflare Pages — Edit"** template |
 | `CLOUDFLARE_ACCOUNT_ID` | Cloudflare dashboard → Workers & Pages → Account ID in the right sidebar |
 
-The workflow **creates the Pages project on first run**, so you never have to touch the dashboard's click-maze. Set the secrets under *Settings → Secrets and variables → Actions*, then re-run the workflow. (A GitHub Pages workflow is also included, for traditionalists.)
+The workflow **creates the Pages project on first run**, so you never have to touch the dashboard's click-maze. Set the secrets under *Settings → Secrets and variables → Actions*, then re-run the workflow and you're live at `https://submission-desk.pages.dev`.
 
 ## Filling the table without guessing
 
