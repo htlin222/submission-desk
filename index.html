@@ -359,7 +359,7 @@
               <table>
                 <thead><tr>
                   <th style="width:100%">Journal</th>
-                  <th><abbr title="Impact Factor. Auto-filled from OpenAlex 2-year mean citedness — a proxy, NOT the official Clarivate JIF. Verify at JCR (Resources tab). Editable.">IF</abbr></th>
+                  <th><abbr title="Official Journal Impact Factor — look it up at JCR (Resources tab) and type it here. Free auto-fill can't provide the official JIF, so adding a journal leaves this blank; the search dropdown shows only a rough citation rate.">IF</abbr></th>
                   <th><abbr title="Published acceptance rate, %">Rate&nbsp;%</abbr></th>
                   <th><abbr title="Your fit, 1–5. Modifies acceptance odds: 1×0.5 … 3×1.0 … 5×1.6. Multipliers are uncalibrated heuristics.">Fit</abbr> <span class="flag">heuristic</span></th>
                   <th><abbr title="Weeks to first decision">Wk</abbr></th>
@@ -501,10 +501,10 @@
   ];
 
   var DEFAULTS=[
-    {name:"New England Journal of Medicine", if_:29.2, rate:6,  fit:3, wk:9,  apc:0},
-    {name:"The Lancet",                      if_:19.22,rate:6,  fit:3, wk:9,  apc:6830},
-    {name:"Perspectives on Medical Education",if_:3.53, rate:28, fit:4, wk:8,  apc:0},
-    {name:"BMC Medical Education",           if_:4.51, rate:40, fit:4, wk:10, apc:2590}
+    {name:"New England Journal of Medicine", if_:96, rate:5,  fit:3, wk:9,  apc:0},
+    {name:"The Lancet",                      if_:98, rate:5,  fit:3, wk:9,  apc:6830},
+    {name:"Perspectives on Medical Education",if_:6,  rate:28, fit:4, wk:8,  apc:0},
+    {name:"BMC Medical Education",           if_:3.5, rate:40, fit:4, wk:10, apc:2590}
   ];
 
   var WEIGHT_DEFS=[
@@ -814,7 +814,7 @@ var MSG={
     if(!list.length && !note){ jMenuEl.hidden=true; return; }
     var html=list.map(function(r,i){
       var meta=[];
-      meta.push(r.if_proxy!=null?("IF~"+r.if_proxy):"IF —");
+      if(r.if_proxy!=null) meta.push("cite~"+r.if_proxy+"/yr");
       if(r.apc_usd!=null) meta.push("$"+Math.round(r.apc_usd).toLocaleString());
       if(r.publisher) meta.push(r.publisher);
       var doaj=r.in_doaj?'<span class="jbadge doaj">DOAJ</span>':'';
@@ -833,7 +833,7 @@ var MSG={
   }
   function pickJournal(r){
     if(!r) return;
-    rows.push({name:r.name, if_:(r.if_proxy!=null?r.if_proxy:0), rate:25, fit:3, wk:6, apc:(r.apc_usd!=null?r.apc_usd:0)});
+    rows.push({name:r.name, if_:"", rate:25, fit:3, wk:6, apc:(r.apc_usd!=null?r.apc_usd:0)});
     if(jSearchEl) jSearchEl.value=""; if(jMenuEl) jMenuEl.hidden=true;
     render();
     var tr=tbody.lastElementChild; if(tr) tr.classList.add("jrow-flash");

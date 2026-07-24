@@ -376,7 +376,7 @@
               <table>
                 <thead><tr>
                   <th style="width:100%">期刊</th>
-                  <th><abbr title="影響因子。自動帶入為 OpenAlex 兩年平均被引數(代理值),非官方 Clarivate JIF。請於「資源」分頁的 JCR 查證。可手動修改。">IF</abbr></th>
+                  <th><abbr title="官方期刊影響因子(JIF)—— 請至「資源」分頁的 JCR 查得後手動填入。免費自動帶入無法提供官方 JIF,故新增期刊時此欄留空;搜尋下拉僅顯示粗略的引用率。">IF</abbr></th>
                   <th><abbr title="該刊公布的接受率(%)">接受率&nbsp;%</abbr></th>
                   <th><abbr title="你的契合度 1–5。用來修正接受機率:1×0.5、3×1.0、5×1.6。這組係數未經校準。">契合</abbr> <span class="flag">未校準</span></th>
                   <th><abbr title="到首次決議所需的週數">週</abbr></th>
@@ -561,10 +561,10 @@
   ];
 
   var DEFAULTS=[
-    {name:"New England Journal of Medicine", if_:29.2, rate:6,  fit:3, wk:9,  apc:0},
-    {name:"The Lancet",                      if_:19.22,rate:6,  fit:3, wk:9,  apc:6830},
-    {name:"Perspectives on Medical Education",if_:3.53, rate:28, fit:4, wk:8,  apc:0},
-    {name:"BMC Medical Education",           if_:4.51, rate:40, fit:4, wk:10, apc:2590}
+    {name:"New England Journal of Medicine", if_:96, rate:5,  fit:3, wk:9,  apc:0},
+    {name:"The Lancet",                      if_:98, rate:5,  fit:3, wk:9,  apc:6830},
+    {name:"Perspectives on Medical Education",if_:6,  rate:28, fit:4, wk:8,  apc:0},
+    {name:"BMC Medical Education",           if_:3.5, rate:40, fit:4, wk:10, apc:2590}
   ];
 
   var WEIGHT_DEFS=[
@@ -1003,7 +1003,7 @@ var MSG={
     if(!list.length && !note){ jMenuEl.hidden=true; return; }
     var html=list.map(function(r,i){
       var meta=[];
-      meta.push(r.if_proxy!=null?("IF~"+r.if_proxy):"IF —");
+      if(r.if_proxy!=null) meta.push("cite~"+r.if_proxy+"/yr");
       if(r.apc_usd!=null) meta.push("$"+Math.round(r.apc_usd).toLocaleString());
       if(r.publisher) meta.push(r.publisher);
       var doaj=r.in_doaj?'<span class="jbadge doaj">DOAJ</span>':'';
@@ -1022,7 +1022,7 @@ var MSG={
   }
   function pickJournal(r){
     if(!r) return;
-    rows.push({name:r.name, if_:(r.if_proxy!=null?r.if_proxy:0), rate:25, fit:3, wk:6, apc:(r.apc_usd!=null?r.apc_usd:0)});
+    rows.push({name:r.name, if_:"", rate:25, fit:3, wk:6, apc:(r.apc_usd!=null?r.apc_usd:0)});
     if(jSearchEl) jSearchEl.value=""; if(jMenuEl) jMenuEl.hidden=true;
     render();
     var tr=tbody.lastElementChild; if(tr) tr.classList.add("jrow-flash");
