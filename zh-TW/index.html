@@ -77,12 +77,11 @@
 
   /* ---------- tab bar ---------- */
   .tabbar{
-    flex:none;height:var(--tabbar-h);display:flex;align-items:stretch;gap:2px;
-    padding:0 14px;background:var(--panel-2);border-bottom:1px solid var(--line);
-    overflow-x:auto;overflow-y:hidden;
+    flex:none;min-height:var(--tabbar-h);display:flex;flex-wrap:wrap;align-items:center;gap:3px 2px;
+    padding:6px 14px;background:var(--panel-2);border-bottom:1px solid var(--line);
   }
   .tab{
-    display:flex;align-items:center;gap:9px;padding:0 16px;border:none;background:transparent;
+    display:flex;align-items:center;gap:9px;padding:0 14px;height:40px;flex:none;border:none;background:transparent;
     cursor:pointer;font-family:var(--body);color:var(--muted);position:relative;
     border-bottom:2.5px solid transparent;transition:color .12s;
   }
