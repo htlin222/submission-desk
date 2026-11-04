@@ -12,8 +12,14 @@ set -eu
 ROOT=$(cd "$(dirname "$0")/.." && pwd)
 cd "$ROOT"
 
-# Load .env if present (auto-export every assignment).
-if [ -f .env ]; then
+# .env holding 1Password refs (op://...) → re-exec under `op run`, which
+# injects the resolved values into the environment.
+if [ -f .env ] && [ -z "${OP_RUN_WRAPPED:-}" ] && grep -q 'op://' .env; then
+  OP_RUN_WRAPPED=1 exec op run --env-file="$ROOT/.env" -- "$ROOT/tools/deploy.sh" "$@"
+fi
+
+# Load plain .env if present (auto-export every assignment).
+if [ -f .env ] && [ -z "${OP_RUN_WRAPPED:-}" ]; then
   set -a
   . ./.env
   set +a
